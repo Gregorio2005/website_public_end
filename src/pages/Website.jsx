@@ -1,5 +1,5 @@
 ﻿import React, { useEffect, useState } from 'react';
-import { submitApplication } from '../services/authService';
+import { submitApplication, getWebsiteNotice } from '../services/authService';
 import logoImg from '../assets/logo.jpeg';
 import estoperaImg from '../assets/estopera.png';
 import tapavalvulaImg from '../assets/tapa_valvula.png';
@@ -39,7 +39,7 @@ function Website() {
   const [isDarkMode, setIsDarkMode] = useState(false);
 
   // Estado para los avisos del administrador
-  const [notice, setNotice] = useState({ enabled: false, text: "Cargando aviso...", type: "loading" });
+  const [notice, setNotice] = useState({ enabled: false, note: "Cargando aviso...", name: "loading" });
 
   // Estados para el formulario de postulación
   const [jobFormData, setJobFormData] = useState({
@@ -66,7 +66,7 @@ function Website() {
         setNotice(currentNotice);
       } catch (error) {
         console.error("Error al cargar el aviso del sitio web:", error);
-        setNotice({ enabled: false, text: "No se pudo cargar el aviso. Intente recargar la página.", type: "error" });
+        setNotice({ enabled: false, note: "No se pudo cargar el aviso.", name: "error" });
       }
     };
     loadNotice();
@@ -720,10 +720,14 @@ function Website() {
               <div className="cert-highlight" style={{ marginTop: '2rem', textAlign: 'left', borderLeft: '5px solid #d32f2f' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', marginBottom: '0.8rem', color: '#d32f2f' }}>
                   <span className="material-symbols-outlined">campaign</span>
-                  <span style={{ fontWeight: '700', fontSize: '0.9rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Aviso de Reclutamiento</span>
+                  <span style={{ fontWeight: '700', fontSize: '0.9rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                    {notice.name && notice.name !== 'none' && notice.name !== 'loading' 
+                      ? notice.name 
+                      : 'Aviso de Reclutamiento'}
+                  </span>
                 </div>
                 <p style={{ fontSize: '1rem', lineHeight: '1.6', margin: 0, fontWeight: '500', color: isDarkMode ? '#e2e8f0' : '#334155' }}>
-                  {notice.text || "Cargando aviso..."}
+                  {notice.note || "Cargando aviso..."}
                 </p>
               </div>
             </div>

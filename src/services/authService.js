@@ -24,3 +24,27 @@ export const submitApplication = async (applicantData) => {
     throw error;
   }
 };
+
+/** 
+ * Obtiene el aviso activo para el sitio web.
+ */
+export const getWebsiteNotice = async () => {
+  try {
+    const response = await fetch(`${API_URL}/website-notice`, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' }
+    });
+    const data = await response.json();
+    
+    const latestNotice = Array.isArray(data.data) && data.data.length > 0 ? data.data[0] : null;
+    
+    return { 
+      enabled: !!latestNotice, 
+      note: latestNotice?.note || 'Actualmente no contamos con vacantes disponibles.', 
+      name: latestNotice?.name || 'none',
+      id: latestNotice?.id || null
+    };
+  } catch (error) {
+    return { enabled: false, note: "No disponible", name: 'none' };
+  }
+};
