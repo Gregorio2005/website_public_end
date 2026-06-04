@@ -13,6 +13,7 @@ const NAV_LINKS = [
   { label: 'Información', href: '#about' },
   { label: 'Capacidades', href: '#capabilities' },
   { label: 'Productos', href: '#products' },
+  { label: 'Carreras', href: '#careers' },
   { label: 'Contacto', href: '#contact' },
 ];
 
@@ -21,6 +22,7 @@ const DRAWER_LINKS = [
   { label: 'Información', href: '#about', icon: 'info' },
   { label: 'Capacidades', href: '#capabilities', icon: 'engineering' },
   { label: 'Productos', href: '#products', icon: 'precision_manufacturing' },
+  { label: 'Carreras', href: '#careers', icon: 'groups' },
   { label: 'Contacto', href: '#contact', icon: 'mail' },
 ];
 
@@ -28,7 +30,6 @@ function Website() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [headerElevated, setHeaderElevated] = useState(false);
   const [contactModalOpen, setContactModalOpen] = useState(false);
-  const [jobModalOpen, setJobModalOpen] = useState(false);
   const [specsModalOpen, setSpecsModalOpen] = useState(false);
   const [providersModalOpen, setProvidersModalOpen] = useState(false);
   const [privacyModalOpen, setPrivacyModalOpen] = useState(false);
@@ -36,6 +37,9 @@ function Website() {
   const [locationModalOpen, setLocationModalOpen] = useState(false);
   const [postulationSuccess, setPostulationSuccess] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
+
+  // Estado para los avisos del administrador
+  const [notice, setNotice] = useState({ enabled: false, text: "Cargando aviso...", type: "loading" });
 
   // Estados para el formulario de postulación
   const [jobFormData, setJobFormData] = useState({
@@ -54,6 +58,24 @@ function Website() {
     link.rel = 'icon';
     link.href = logoImg;
     document.getElementsByTagName('head')[0].appendChild(link);
+
+    // Cargar el aviso desde el backend al montar el componente
+    const loadNotice = async () => {
+      try {
+        const currentNotice = await getWebsiteNotice();
+        setNotice(currentNotice);
+      } catch (error) {
+        console.error("Error al cargar el aviso del sitio web:", error);
+        setNotice({ enabled: false, text: "No se pudo cargar el aviso. Intente recargar la página.", type: "error" });
+      }
+    };
+    loadNotice();
+
+    // El listener de 'storage' ya no es necesario para la sincronización principal
+    // pero lo mantenemos si hay otras partes que aún lo usen o para depuración.
+    // Si no hay otras dependencias, se puede eliminar completamente.
+    // window.addEventListener('storage', checkNotice);
+    // return () => window.removeEventListener('storage', checkNotice);
   }, []);
 
   useEffect(() => {
@@ -64,11 +86,11 @@ function Website() {
   }, []);
 
   useEffect(() => {
-    document.body.style.overflow = (drawerOpen || contactModalOpen || jobModalOpen || specsModalOpen || providersModalOpen || privacyModalOpen || catalogModalOpen || locationModalOpen) ? 'hidden' : '';
+    document.body.style.overflow = (drawerOpen || contactModalOpen || specsModalOpen || providersModalOpen || privacyModalOpen || catalogModalOpen || locationModalOpen) ? 'hidden' : '';
     return () => {
       document.body.style.overflow = '';
     };
-  }, [drawerOpen, contactModalOpen, jobModalOpen, specsModalOpen, providersModalOpen, privacyModalOpen, catalogModalOpen, locationModalOpen]);
+  }, [drawerOpen, contactModalOpen, specsModalOpen, providersModalOpen, privacyModalOpen, catalogModalOpen, locationModalOpen]);
 
   const handleNavLinkClick = (e, href) => {
     if (href === '#contact') {
@@ -102,6 +124,12 @@ function Website() {
     <div className={`website-page ${isDarkMode ? 'dark-mode' : ''}`}>
       {/* Estilos para el Modo Oscuro - Inyectados para no alterar el CSS original */}
       <style>{`
+        html { scroll-behavior: smooth; }
+        
+        /* Estilo para el aviso superior */
+        .announcement-bar { background-color: #d32f2f; color: white; text-align: center; padding: 12px; font-weight: 700; font-size: 0.95rem; border-bottom: 3px solid rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center; gap: 10px; z-index: 1001; position: relative; }
+        .dark-mode .announcement-bar { background-color: #1e293b; border-color: #38bdf8; }
+
         /* Ajuste para el modo claro: Contorno para el botón principal */
         .hero-button--primary {
           border: 1px solid #d32f2f !important;
@@ -143,6 +171,18 @@ function Website() {
           background-color: #1e293b; 
           border: 1px solid #334155; 
           box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+        }
+        
+        /* Estilos para la nueva sección de postulación */
+        .join-us-section { padding: 6rem 0; background-color: #f8fafc; border-top: 1px solid #e2e8f0; }
+        .dark-mode .join-us-section { background-color: #0f172a; border-color: #1e293b; }
+        .join-us-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; }
+        @media (max-width: 968px) {
+          .join-us-grid { grid-template-columns: 1fr; gap: 3rem; }
+          .join-us-content { text-align: center; }
+        }
+        .join-us-form-card { 
+          background: white; padding: 2.5rem; border-radius: 20px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.05); border: 1px solid #e2e8f0;
         }
         .dark-mode .product-card h4, .dark-mode .capability-card__title, .dark-mode .section-heading { color: #f8fafc; }
         .dark-mode .section-text, .dark-mode .hero-copy, .dark-mode .capability-card__text { color: #94a3b8; }
@@ -402,6 +442,13 @@ function Website() {
         }
       `}</style>
 
+      {notice.enabled && (
+        <div className="announcement-bar">
+          <span className="material-symbols-outlined">notification_important</span>
+          {notice.text}
+        </div>
+      )}
+
       <header className={`topbar ${headerElevated ? 'topbar--scrolled' : ''}`}>
         <div className="topbar__brand-group">
           {/* El interruptor de tema ahora está aquí, reemplazando al menú */}
@@ -473,9 +520,9 @@ function Website() {
             <button className="hero-button hero-button--primary" type="button" onClick={() => setCatalogModalOpen(true)}>
               Explorar Catálogo
             </button>
-            <button className="hero-button hero-button--secondary" type="button" onClick={() => setJobModalOpen(true)}>
+            <a href="#careers" className="hero-button hero-button--secondary" style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
               Postular Puesto
-            </button>
+            </a>
           </div>
         </div>
       </main>
@@ -658,6 +705,100 @@ function Website() {
         </div>
       </section>
 
+      <section className="join-us-section" id="careers">
+        <div className="section-inner">
+          <div className="join-us-grid">
+            <div className="join-us-content">
+              <p className="eyebrow">Carreras en Sealing Products</p>
+              <h2 className="section-heading">Únete a nuestro equipo de expertos</h2>
+              <p className="section-text" style={{ fontSize: '1.1rem', marginBottom: '2rem' }}>
+                Estamos en la búsqueda constante de profesionales apasionados por la precisión y la excelencia industrial. 
+                Si quieres ser parte de una empresa con más de 30 años de trayectoria fabricando soluciones de sellado de alta gama, 
+                esta es tu oportunidad.
+              </p>
+
+              <div className="cert-highlight" style={{ marginTop: '2rem', textAlign: 'left', borderLeft: '5px solid #d32f2f' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', marginBottom: '0.8rem', color: '#d32f2f' }}>
+                  <span className="material-symbols-outlined">campaign</span>
+                  <span style={{ fontWeight: '700', fontSize: '0.9rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Aviso de Reclutamiento</span>
+                </div>
+                <p style={{ fontSize: '1rem', lineHeight: '1.6', margin: 0, fontWeight: '500', color: isDarkMode ? '#e2e8f0' : '#334155' }}>
+                  {notice.text || "Cargando aviso..."}
+                </p>
+              </div>
+            </div>
+
+            <div className="join-us-form-card product-card">
+              {postulationSuccess ? (
+                <div style={{ textAlign: 'center', padding: '1rem' }}>
+                  <span className="material-symbols-outlined" style={{ fontSize: '4.5rem', color: '#10b981', marginBottom: '1rem' }}>
+                    check_circle
+                  </span>
+                  <h3 className="catalog-item__title" style={{ fontSize: '1.5rem' }}>¡Postulación Enviada!</h3>
+                  <p className="section-text" style={{ margin: '1rem 0 2rem' }}>
+                    Hemos recibido tus datos con éxito. Nuestro equipo de recursos humanos evaluará tu perfil y te contactará pronto.
+                  </p>
+                  <button 
+                    className="hero-button hero-button--primary" 
+                    style={{ width: '100%' }}
+                    onClick={() => setPostulationSuccess(false)}
+                  >
+                    Enviar otra postulación
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <h4 style={{ fontSize: '1.3rem', marginBottom: '0.5rem', color: isDarkMode ? '#f8fafc' : '#1e293b' }}>
+                    Formulario de Selección
+                  </h4>
+                  <p style={{ fontSize: '0.85rem', color: '#64748b', marginBottom: '1.5rem' }}>
+                    Complete sus datos y nuestro equipo de RRHH revisará su perfil.
+                  </p>
+                  <form className="job-form" onSubmit={handleJobSubmit}>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                      <div className="job-form__field">
+                        <label>Nombre</label>
+                        <input type="text" name="name" value={jobFormData.name} onChange={handleJobChange} placeholder="Nombre" required />
+                      </div>
+                      <div className="job-form__field">
+                        <label>Apellido</label>
+                        <input type="text" name="lastname" value={jobFormData.lastname} onChange={handleJobChange} placeholder="Apellido" required />
+                      </div>
+                    </div>
+                    <div className="job-form__field">
+                      <label>Cédula de Identidad</label>
+                      <input type="text" name="ci" value={jobFormData.ci} onChange={handleJobChange} placeholder="V-00.000.000" required />
+                    </div>
+                    <div className="job-form__field">
+                      <label>Correo Electrónico</label>
+                      <input type="email" name="email" value={jobFormData.email} onChange={handleJobChange} placeholder="ejemplo@correo.com" required />
+                    </div>
+                    <div className="job-form__field">
+                      <label>Cargo de interés</label>
+                      <select name="rol" value={jobFormData.rol} onChange={handleJobChange} required>
+                        <option value="">Seleccione un área...</option>
+                        <option value="Administrador">Administración / Logística</option>
+                        <option value="Trabajador">Operario de Planta</option>
+                        <option value="Jefe de Calidad">Control de Calidad</option>
+                        <option value="Jefe de Ingeniería">Ingeniería y Diseño</option>
+                      </select>
+                    </div>
+                    <button 
+                      type="submit" 
+                      className="hero-button hero-button--primary job-submit-btn"
+                      disabled={jobLoading}
+                      style={{ marginTop: '1rem' }}
+                    >
+                      {jobLoading ? 'Procesando...' : 'Enviar mi postulación'}
+                    </button>
+                  </form>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      </section>
+
       <footer className="site-footer">
         <div className="footer-inner">
           <div className="footer-brand">
@@ -728,108 +869,6 @@ function Website() {
                 <div><p className="contact-label">Teléfono de contacto</p><p className="contact-value">+58 (212) 555-0123</p></div>
               </div>
             </div>
-          </div>
-        </div>
-      )}
-
-      {/* Modal de Postulación */}
-      {jobModalOpen && (
-        <div className="contact-overlay" onClick={() => { setJobModalOpen(false); setPostulationSuccess(false); }}>
-          <div className="contact-modal" onClick={(e) => e.stopPropagation()}>
-            <button className="contact-close" onClick={() => { setJobModalOpen(false); setPostulationSuccess(false); }}>
-              <span className="material-symbols-outlined">close</span>
-            </button>
-
-            {postulationSuccess ? (
-              <div style={{ textAlign: 'center', padding: '2rem 0' }}>
-                <span className="material-symbols-outlined" style={{ fontSize: '4.5rem', color: '#10b981', marginBottom: '1rem' }}>
-                  check_circle
-                </span>
-                <h3 className="contact-title" style={{ marginBottom: '1rem' }}>¡Postulación Enviada!</h3>
-                <p style={{ color: isDarkMode ? '#94a3b8' : '#64748b', marginBottom: '2rem', lineHeight: '1.5' }}>
-                  Hemos recibido tus datos correctamente en nuestro sistema. El equipo de RRHH revisará tu perfil y se pondrá en contacto contigo pronto.
-                </p>
-                <button 
-                  className="hero-button hero-button--primary" 
-                  style={{ width: '100%' }}
-                  onClick={() => { setJobModalOpen(false); setPostulationSuccess(false); }}
-                >
-                  Entendido
-                </button>
-              </div>
-            ) : (
-              <>
-                <h3 className="contact-title">Postulación de Puesto</h3>
-                <form className="job-form" onSubmit={handleJobSubmit}>
-                  <div className="job-form__field">
-                    <label>Nombre</label>
-                    <input 
-                      type="text" 
-                      name="name"
-                      value={jobFormData.name}
-                      onChange={handleJobChange}
-                      placeholder="Tu nombre" 
-                      required 
-                    />
-                  </div>
-                  <div className="job-form__field">
-                    <label>Apellido</label>
-                    <input 
-                      type="text" 
-                      name="lastname"
-                      value={jobFormData.lastname}
-                      onChange={handleJobChange}
-                      placeholder="Tu apellido" 
-                      required 
-                    />
-                  </div>
-                  <div className="job-form__field">
-                    <label>Cédula</label>
-                    <input 
-                      type="text" 
-                      name="ci"
-                      value={jobFormData.ci}
-                      onChange={handleJobChange}
-                      placeholder="V-00.000.000" 
-                      required 
-                    />
-                  </div>
-                  <div className="job-form__field">
-                    <label>Correo Electrónico</label>
-                    <input 
-                      type="email" 
-                      name="email"
-                      value={jobFormData.email}
-                      onChange={handleJobChange}
-                      placeholder="correo@ejemplo.com" 
-                      required 
-                    />
-                  </div>
-                  <div className="job-form__field">
-                    <label>Cargo a postular</label>
-                    <select 
-                      name="rol"
-                      value={jobFormData.rol}
-                      onChange={handleJobChange}
-                      required
-                    >
-                      <option value="">Seleccione un cargo...</option>
-                      <option value="Administrador">Administrador</option>
-                      <option value="Trabajador">Trabajador</option>
-                      <option value="Jefe de Calidad">Jefe de Calidad</option>
-                      <option value="Jefe de Ingeniería">Jefe de Ingeniería</option>
-                    </select>
-                  </div>
-                  <button 
-                    type="submit" 
-                    className="hero-button hero-button--primary job-submit-btn"
-                    disabled={jobLoading}
-                  >
-                    {jobLoading ? 'Enviando...' : 'Enviar Postulación'}
-                  </button>
-                </form>
-              </>
-            )}
           </div>
         </div>
       )}
