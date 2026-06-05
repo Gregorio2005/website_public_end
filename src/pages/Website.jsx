@@ -788,7 +788,7 @@ function Website() {
 
         <div className="footer-bottom">
           <p>© 2026 Sealing Products C.A.</p>
-          <p>Todos los derechos reservados.</p>
+          <p style={{ maxWidth: '800px', margin: '0 auto', fontSize: '0.75rem', opacity: 0.8, lineHeight: '1.4' }}>Aclaración legal: Esta página <strong>NO ES OFICIAL</strong>. Se trata exclusivamente de un proyecto universitario con fines académicos inspirado en la empresa Sealing Products C.A.</p>
         </div>
       </footer>
 
