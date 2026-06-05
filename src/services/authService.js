@@ -1,7 +1,8 @@
 /**
  * Servicio para manejar la comunicación con el backend desde el Website independiente.
  */
-const API_URL = '/api'; 
+// URL del backend en producción (Render)
+const API_URL = 'https://backend-sealing-products.onrender.com/api'; 
 
 export const submitApplication = async (applicantData) => {
   try {
