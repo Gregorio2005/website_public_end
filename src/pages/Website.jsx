@@ -35,6 +35,7 @@ function Website() {
   const [privacyModalOpen, setPrivacyModalOpen] = useState(false);
   const [catalogModalOpen, setCatalogModalOpen] = useState(false);
   const [locationModalOpen, setLocationModalOpen] = useState(false);
+  const [jobModalOpen, setJobModalOpen] = useState(false);
   const [postulationSuccess, setPostulationSuccess] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
 
@@ -59,23 +60,23 @@ function Website() {
     link.href = logoImg;
     document.getElementsByTagName('head')[0].appendChild(link);
 
-    // Cargar el aviso desde el backend al montar el componente
-    const loadNotice = async () => {
+    // Función para cargar el aviso
+    const fetchNotice = async () => {
       try {
         const currentNotice = await getWebsiteNotice();
         setNotice(currentNotice);
       } catch (error) {
-        console.error("Error al cargar el aviso del sitio web:", error);
         setNotice({ enabled: false, note: "No se pudo cargar el aviso.", name: "error" });
       }
     };
-    loadNotice();
 
-    // El listener de 'storage' ya no es necesario para la sincronización principal
-    // pero lo mantenemos si hay otras partes que aún lo usen o para depuración.
-    // Si no hay otras dependencias, se puede eliminar completamente.
-    // window.addEventListener('storage', checkNotice);
-    // return () => window.removeEventListener('storage', checkNotice);
+    fetchNotice(); // Carga inicial al entrar
+
+    // Polling: Pregunta al servidor cada 30 segundos si el aviso cambió
+    const intervalId = setInterval(fetchNotice, 30000);
+
+    // Limpieza al salir de la página
+    return () => clearInterval(intervalId);
   }, []);
 
   useEffect(() => {
@@ -86,11 +87,11 @@ function Website() {
   }, []);
 
   useEffect(() => {
-    document.body.style.overflow = (drawerOpen || contactModalOpen || specsModalOpen || providersModalOpen || privacyModalOpen || catalogModalOpen || locationModalOpen) ? 'hidden' : '';
+    document.body.style.overflow = (drawerOpen || contactModalOpen || specsModalOpen || providersModalOpen || privacyModalOpen || catalogModalOpen || locationModalOpen || jobModalOpen) ? 'hidden' : '';
     return () => {
       document.body.style.overflow = '';
     };
-  }, [drawerOpen, contactModalOpen, specsModalOpen, providersModalOpen, privacyModalOpen, catalogModalOpen, locationModalOpen]);
+  }, [drawerOpen, contactModalOpen, specsModalOpen, providersModalOpen, privacyModalOpen, catalogModalOpen, locationModalOpen, jobModalOpen]);
 
   const handleNavLinkClick = (e, href) => {
     if (href === '#contact') {
@@ -126,10 +127,6 @@ function Website() {
       <style>{`
         html { scroll-behavior: smooth; }
         
-        /* Estilo para el aviso superior */
-        .announcement-bar { background-color: #d32f2f; color: white; text-align: center; padding: 12px; font-weight: 700; font-size: 0.95rem; border-bottom: 3px solid rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center; gap: 10px; z-index: 1001; position: relative; }
-        .dark-mode .announcement-bar { background-color: #1e293b; border-color: #38bdf8; }
-
         /* Ajuste para el modo claro: Contorno para el botón principal */
         .hero-button--primary {
           border: 1px solid #d32f2f !important;
@@ -176,7 +173,7 @@ function Website() {
         /* Estilos para la nueva sección de postulación */
         .join-us-section { padding: 6rem 0; background-color: #f8fafc; border-top: 1px solid #e2e8f0; }
         .dark-mode .join-us-section { background-color: #0f172a; border-color: #1e293b; }
-        .join-us-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; }
+        .join-us-grid { display: grid; grid-template-columns: 1fr; gap: 4rem; align-items: center; justify-items: center; }
         @media (max-width: 968px) {
           .join-us-grid { grid-template-columns: 1fr; gap: 3rem; }
           .join-us-content { text-align: center; }
@@ -441,13 +438,6 @@ function Website() {
           transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
         }
       `}</style>
-
-      {notice.enabled && (
-        <div className="announcement-bar">
-          <span className="material-symbols-outlined">notification_important</span>
-          {notice.text}
-        </div>
-      )}
 
       <header className={`topbar ${headerElevated ? 'topbar--scrolled' : ''}`}>
         <div className="topbar__brand-group">
@@ -730,73 +720,24 @@ function Website() {
                   {notice.note || "Cargando aviso..."}
                 </p>
               </div>
-            </div>
 
-            <div className="join-us-form-card product-card">
-              {postulationSuccess ? (
-                <div style={{ textAlign: 'center', padding: '1rem' }}>
-                  <span className="material-symbols-outlined" style={{ fontSize: '4.5rem', color: '#10b981', marginBottom: '1rem' }}>
-                    check_circle
-                  </span>
-                  <h3 className="catalog-item__title" style={{ fontSize: '1.5rem' }}>¡Postulación Enviada!</h3>
-                  <p className="section-text" style={{ margin: '1rem 0 2rem' }}>
-                    Hemos recibido tus datos con éxito. Nuestro equipo de recursos humanos evaluará tu perfil y te contactará pronto.
-                  </p>
-                  <button 
-                    className="hero-button hero-button--primary" 
-                    style={{ width: '100%' }}
-                    onClick={() => setPostulationSuccess(false)}
-                  >
-                    Enviar otra postulación
-                  </button>
-                </div>
-              ) : (
-                <>
-                  <h4 style={{ fontSize: '1.3rem', marginBottom: '0.5rem', color: isDarkMode ? '#f8fafc' : '#1e293b' }}>
-                    Formulario de Selección
-                  </h4>
-                  <p style={{ fontSize: '0.85rem', color: '#64748b', marginBottom: '1.5rem' }}>
-                    Complete sus datos y nuestro equipo de RRHH revisará su perfil.
-                  </p>
-                  <form className="job-form" onSubmit={handleJobSubmit}>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                      <div className="job-form__field">
-                        <label>Nombre</label>
-                        <input type="text" name="name" value={jobFormData.name} onChange={handleJobChange} placeholder="Nombre" required />
-                      </div>
-                      <div className="job-form__field">
-                        <label>Apellido</label>
-                        <input type="text" name="lastname" value={jobFormData.lastname} onChange={handleJobChange} placeholder="Apellido" required />
-                      </div>
-                    </div>
-                    <div className="job-form__field">
-                      <label>Cédula de Identidad</label>
-                      <input type="text" name="ci" value={jobFormData.ci} onChange={handleJobChange} placeholder="V-00.000.000" required />
-                    </div>
-                    <div className="job-form__field">
-                      <label>Correo Electrónico</label>
-                      <input type="email" name="email" value={jobFormData.email} onChange={handleJobChange} placeholder="ejemplo@correo.com" required />
-                    </div>
-                    <div className="job-form__field">
-                      <label>Cargo de interés</label>
-                      <select name="rol" value={jobFormData.rol} onChange={handleJobChange} required>
-                        <option value="">Seleccione un área...</option>
-                        <option value="Administrador">Administración / Logística</option>
-                        <option value="Trabajador">Operario de Planta</option>
-                        <option value="Jefe de Calidad">Control de Calidad</option>
-                        <option value="Jefe de Ingeniería">Ingeniería y Diseño</option>
-                      </select>
-                    </div>
-                    <button 
-                      type="submit" 
-                      className="hero-button hero-button--primary job-submit-btn"
-                      disabled={jobLoading}
-                      style={{ marginTop: '1rem' }}
-                    >
-                      {jobLoading ? 'Procesando...' : 'Enviar mi postulación'}
-                    </button>
-                  </form>
-                </>
+              {/* Botón dinámico: Solo aparece si el ID no es 1 (Aviso de "No hay vacantes") */}
+              {notice.id && Number(notice.id) !== 1 && (
+                <button 
+                  className="hero-button hero-button--primary" 
+                  style={{ 
+                    marginTop: '1.5rem', 
+                    width: 'fit-content', 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    gap: '0.8rem',
+                    boxShadow: '0 10px 15px -3px rgba(211, 47, 47, 0.2)'
+                  }}
+                  onClick={() => setJobModalOpen(true)}
+                >
+                  <span className="material-symbols-outlined">how_to_reg</span>
+                  Aplicar a postulación
+                </button>
               )}
             </div>
           </div>
@@ -1136,6 +1077,81 @@ function Website() {
                 ¿Cómo llegar?
               </a>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de Postulación */}
+      {jobModalOpen && (
+        <div className="contact-overlay" onClick={() => { setJobModalOpen(false); setPostulationSuccess(false); }}>
+          <div className="contact-modal" style={{ maxWidth: '500px', width: '95%' }} onClick={(e) => e.stopPropagation()}>
+            <button className="contact-close" onClick={() => { setJobModalOpen(false); setPostulationSuccess(false); }}>
+              <span className="material-symbols-outlined">close</span>
+            </button>
+            
+            {postulationSuccess ? (
+              <div style={{ textAlign: 'center', padding: '1rem' }}>
+                <span className="material-symbols-outlined" style={{ fontSize: '4.5rem', color: '#10b981', marginBottom: '1rem' }}>
+                  check_circle
+                </span>
+                <h3 className="catalog-item__title" style={{ fontSize: '1.5rem' }}>¡Postulación Enviada!</h3>
+                <p className="section-text" style={{ margin: '1rem 0 2rem' }}>
+                  Hemos recibido tus datos con éxito. Nuestro equipo de recursos humanos evaluará tu perfil y te contactará pronto.
+                </p>
+                <button 
+                  className="hero-button hero-button--primary" 
+                  style={{ width: '100%' }}
+                  onClick={() => { setJobModalOpen(false); setPostulationSuccess(false); }}
+                >
+                  Cerrar ventana
+                </button>
+              </div>
+            ) : (
+              <>
+                <h3 className="contact-title" style={{ marginBottom: '0.5rem' }}>Formulario de Selección</h3>
+                <p style={{ fontSize: '0.85rem', color: '#64748b', marginBottom: '1.5rem', textAlign: 'center' }}>
+                  Complete sus datos para postularse a la vacante actual.
+                </p>
+                <form className="job-form" onSubmit={handleJobSubmit}>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                    <div className="job-form__field">
+                      <label>Nombre</label>
+                      <input type="text" name="name" value={jobFormData.name} onChange={handleJobChange} placeholder="Nombre" required />
+                    </div>
+                    <div className="job-form__field">
+                      <label>Apellido</label>
+                      <input type="text" name="lastname" value={jobFormData.lastname} onChange={handleJobChange} placeholder="Apellido" required />
+                    </div>
+                  </div>
+                  <div className="job-form__field">
+                    <label>Cédula de Identidad</label>
+                    <input type="text" name="ci" value={jobFormData.ci} onChange={handleJobChange} placeholder="V-00.000.000" required />
+                  </div>
+                  <div className="job-form__field">
+                    <label>Correo Electrónico</label>
+                    <input type="email" name="email" value={jobFormData.email} onChange={handleJobChange} placeholder="ejemplo@correo.com" required />
+                  </div>
+                  <div className="job-form__field">
+                    <label>Cargo de interés</label>
+                    <select name="rol" value={jobFormData.rol} onChange={handleJobChange} required>
+                      <option value="">Seleccione un área...</option>
+                      <option value="Administrador">Administración / Logística</option>
+                      <option value="Trabajador">Operario de Planta</option>
+                      <option value="Jefe de Calidad">Control de Calidad</option>
+                      <option value="Jefe de Ingeniería">Ingeniería y Diseño</option>
+                    </select>
+                  </div>
+                  <button 
+                    type="submit" 
+                    className="hero-button hero-button--primary job-submit-btn"
+                    disabled={jobLoading}
+                    style={{ marginTop: '1rem' }}
+                  >
+                    {jobLoading ? 'Procesando...' : 'Enviar mi postulación'}
+                  </button>
+                </form>
+              </>
+            )}
           </div>
         </div>
       )}
