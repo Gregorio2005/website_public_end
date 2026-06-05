@@ -259,6 +259,8 @@ function Website() {
         }
         .job-form__field input, .job-form__field select {
           padding: 0.75rem;
+          width: 100%;
+          box-sizing: border-box;
           border: 1px solid #926f6a;
           border-radius: 8px;
           background: #ffffff;
@@ -271,6 +273,18 @@ function Website() {
           color: #f8fafc; 
         }
         .job-submit-btn { margin-top: 0.5rem; width: 100%; border: none; }
+
+        /* Ajuste responsive para filas de formulario (Nombre/Apellido) */
+        .job-form__row {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 1rem;
+        }
+        @media (max-width: 480px) {
+          .job-form__row {
+            grid-template-columns: 1fr;
+          }
+        }
 
         /* Estilos para el Modal de Especificaciones Técnicas */
         .specs-modal {
@@ -1113,7 +1127,7 @@ function Website() {
                   Complete sus datos para postularse a la vacante actual.
                 </p>
                 <form className="job-form" onSubmit={handleJobSubmit}>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                  <div className="job-form__row">
                     <div className="job-form__field">
                       <label>Nombre</label>
                       <input type="text" name="name" value={jobFormData.name} onChange={handleJobChange} placeholder="Nombre" required />
