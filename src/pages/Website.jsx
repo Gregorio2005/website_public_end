@@ -1,29 +1,29 @@
-﻿import React, { useEffect, useState } from 'react';
-import { submitApplication, getWebsiteNotice } from '../services/authService';
-import logoImg from '../assets/logo.jpeg';
-import estoperaImg from '../assets/estopera.png';
-import tapavalvulaImg from '../assets/tapa_valvula.png';
-import oringImg from '../assets/oring.png';
-import sellovalvulaImg from '../assets/sello_valvula.png';
-import collarinImg from '../assets/collarin.png';
-import './Website.css';
+﻿import React, { useEffect, useState } from "react";
+import { submitApplication, getWebsiteNotice } from "../services/authService";
+import logoImg from "../assets/logo.jpeg";
+import estoperaImg from "../assets/estopera.png";
+import tapavalvulaImg from "../assets/tapa_valvula.png";
+import oringImg from "../assets/oring.png";
+import sellovalvulaImg from "../assets/sello_valvula.png";
+import collarinImg from "../assets/collarin.png";
+import "./Website.css";
 
 const NAV_LINKS = [
-  { label: 'Inicio', href: '#home' },
-  { label: 'Información', href: '#about' },
-  { label: 'Capacidades', href: '#capabilities' },
-  { label: 'Productos', href: '#products' },
-  { label: 'Carreras', href: '#careers' },
-  { label: 'Contacto', href: '#contact' },
+  { label: "Inicio", href: "#home", icon: "home" },
+  { label: "Información", href: "#about", icon: "info" },
+  { label: "Capacidades", href: "#capabilities", icon: "engineering" },
+  { label: "Productos", href: "#products", icon: "precision_manufacturing" },
+  { label: "Carreras", href: "#careers", icon: "groups" },
+  { label: "Contacto", href: "#contact", icon: "mail" },
 ];
 
 const DRAWER_LINKS = [
-  { label: 'Inicio', href: '#home', icon: 'home' },
-  { label: 'Información', href: '#about', icon: 'info' },
-  { label: 'Capacidades', href: '#capabilities', icon: 'engineering' },
-  { label: 'Productos', href: '#products', icon: 'precision_manufacturing' },
-  { label: 'Carreras', href: '#careers', icon: 'groups' },
-  { label: 'Contacto', href: '#contact', icon: 'mail' },
+  { label: "Inicio", href: "#home", icon: "home" },
+  { label: "Información", href: "#about", icon: "info" },
+  { label: "Capacidades", href: "#capabilities", icon: "engineering" },
+  { label: "Productos", href: "#products", icon: "precision_manufacturing" },
+  { label: "Carreras", href: "#careers", icon: "groups" },
+  { label: "Contacto", href: "#contact", icon: "mail" },
 ];
 
 function Website() {
@@ -40,25 +40,31 @@ function Website() {
   const [isDarkMode, setIsDarkMode] = useState(false);
 
   // Estado para los avisos del administrador
-  const [notice, setNotice] = useState({ enabled: false, note: "Cargando aviso...", name: "loading" });
+  const [notice, setNotice] = useState({
+    enabled: false,
+    note: "Cargando aviso...",
+    name: "loading",
+  });
 
   // Estados para el formulario de postulación
   const [jobFormData, setJobFormData] = useState({
-    name: '',
-    lastname: '',
-    ci: '',
-    email: '',
-    rol: ''
+    name: "",
+    lastname: "",
+    ci: "",
+    email: "",
+    rol: "",
   });
   const [jobLoading, setJobLoading] = useState(false);
 
   useEffect(() => {
     // Configuración dinámica del favicon y título de la página
-    document.title = 'Sealing Products C.A.';
-    const link = document.querySelector("link[rel~='icon']") || document.createElement('link');
-    link.rel = 'icon';
+    document.title = "Sealing Products C.A.";
+    const link =
+      document.querySelector("link[rel~='icon']") ||
+      document.createElement("link");
+    link.rel = "icon";
     link.href = logoImg;
-    document.getElementsByTagName('head')[0].appendChild(link);
+    document.getElementsByTagName("head")[0].appendChild(link);
 
     // Función para cargar el aviso
     const fetchNotice = async () => {
@@ -66,7 +72,11 @@ function Website() {
         const currentNotice = await getWebsiteNotice();
         setNotice(currentNotice);
       } catch (error) {
-        setNotice({ enabled: false, note: "No se pudo cargar el aviso.", name: "error" });
+        setNotice({
+          enabled: false,
+          note: "No se pudo cargar el aviso.",
+          name: "error",
+        });
       }
     };
 
@@ -82,19 +92,38 @@ function Website() {
   useEffect(() => {
     const handleScroll = () => setHeaderElevated(window.scrollY > 50);
     handleScroll();
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   useEffect(() => {
-    document.body.style.overflow = (drawerOpen || contactModalOpen || specsModalOpen || providersModalOpen || privacyModalOpen || catalogModalOpen || locationModalOpen || jobModalOpen) ? 'hidden' : '';
+    document.body.style.overflow =
+      drawerOpen ||
+      contactModalOpen ||
+      specsModalOpen ||
+      providersModalOpen ||
+      privacyModalOpen ||
+      catalogModalOpen ||
+      locationModalOpen ||
+      jobModalOpen
+        ? "hidden"
+        : "";
     return () => {
-      document.body.style.overflow = '';
+      document.body.style.overflow = "";
     };
-  }, [drawerOpen, contactModalOpen, specsModalOpen, providersModalOpen, privacyModalOpen, catalogModalOpen, locationModalOpen, jobModalOpen]);
+  }, [
+    drawerOpen,
+    contactModalOpen,
+    specsModalOpen,
+    providersModalOpen,
+    privacyModalOpen,
+    catalogModalOpen,
+    locationModalOpen,
+    jobModalOpen,
+  ]);
 
   const handleNavLinkClick = (e, href) => {
-    if (href === '#contact') {
+    if (href === "#contact") {
       e.preventDefault();
       setContactModalOpen(true);
     }
@@ -103,7 +132,7 @@ function Website() {
 
   const handleJobChange = (e) => {
     const { name, value } = e.target;
-    setJobFormData(prev => ({ ...prev, [name]: value }));
+    setJobFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleJobSubmit = async (e) => {
@@ -113,7 +142,7 @@ function Website() {
       await submitApplication(jobFormData);
       setPostulationSuccess(true);
       // Limpiar formulario
-      setJobFormData({ name: '', lastname: '', ci: '', email: '', rol: '' });
+      setJobFormData({ name: "", lastname: "", ci: "", email: "", rol: "" });
     } catch (error) {
       alert(`Error al enviar postulación: ${error.message}`);
     } finally {
@@ -122,11 +151,11 @@ function Website() {
   };
 
   return (
-    <div className={`website-page ${isDarkMode ? 'dark-mode' : ''}`}>
+    <div className={`website-page ${isDarkMode ? "dark-mode" : ""}`}>
       {/* Estilos para el Modo Oscuro - Inyectados para no alterar el CSS original */}
       <style>{`
         html { scroll-behavior: smooth; }
-        
+
         /* Ajuste para el modo claro: Contorno para el botón principal */
         .hero-button--primary {
           border: 1px solid #d32f2f !important;
@@ -157,19 +186,19 @@ function Website() {
         .dark-mode .drawer { background-color: #1e293b; color: white; }
         .dark-mode .drawer__link { color: #cbd5e1; }
         .dark-mode .drawer__link:hover { background-color: #38bdf8 !important; color: #ffffff !important; }
-        .dark-mode .hero-section__gradient { 
-          background: linear-gradient(to top, #0f172a 0%, rgba(15, 23, 42, 0.8) 50%, transparent 100%); 
+        .dark-mode .hero-section__gradient {
+          background: linear-gradient(to top, #0f172a 0%, rgba(15, 23, 42, 0.8) 50%, transparent 100%);
         }
-        .dark-mode .about-section, 
-        .dark-mode .capabilities-section, 
+        .dark-mode .about-section,
+        .dark-mode .capabilities-section,
         .dark-mode .products-section { background-color: #0f172a; }
-        .dark-mode .product-card, 
-        .dark-mode .capability-card--accent { 
-          background-color: #1e293b; 
-          border: 1px solid #334155; 
+        .dark-mode .product-card,
+        .dark-mode .capability-card--accent {
+          background-color: #1e293b;
+          border: 1px solid #334155;
           box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
         }
-        
+
         /* Estilos para la nueva sección de postulación */
         .join-us-section { padding: 6rem 0; background-color: #f8fafc; border-top: 1px solid #e2e8f0; }
         .dark-mode .join-us-section { background-color: #0f172a; border-color: #1e293b; }
@@ -178,18 +207,18 @@ function Website() {
           .join-us-grid { grid-template-columns: 1fr; gap: 3rem; }
           .join-us-content { text-align: center; }
         }
-        .join-us-form-card { 
+        .join-us-form-card {
           background: white; padding: 2.5rem; border-radius: 20px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.05); border: 1px solid #e2e8f0;
         }
         .dark-mode .product-card h4, .dark-mode .capability-card__title, .dark-mode .section-heading { color: #f8fafc; }
         .dark-mode .section-text, .dark-mode .hero-copy, .dark-mode .capability-card__text { color: #94a3b8; }
-        
+
         /* Unificación del bloque de estadísticas con el color del Footer Oscuro */
         .dark-mode .stats-section { background-color: #020617; border-top: 1px solid #1e293b; border-bottom: 1px solid #1e293b; }
-        .dark-mode .stats-card { 
-          background-color: transparent !important; 
-          border: none !important; 
-          box-shadow: none !important; 
+        .dark-mode .stats-card {
+          background-color: transparent !important;
+          border: none !important;
+          box-shadow: none !important;
         }
         .dark-mode .stats-value { color: #38bdf8 !important; }
         .dark-mode .stats-label { color: #94a3b8 !important; }
@@ -198,15 +227,15 @@ function Website() {
         .dark-mode .footer-bottom { border-top: 1px solid #1e293b; color: #64748b; }
         .dark-mode .contact-modal { background-color: #1e293b; color: white; }
         .dark-mode .contact-value { color: #38bdf8; }
-        
+
         /* Delineado claro para botones en modo oscuro */
         .dark-mode .hero-button--secondary { border: 1px solid #f8fafc !important; color: #f8fafc; }
         .dark-mode .hero-button--primary { border: 1px solid #38bdf8; }
         .dark-mode .topbar__menu-button { border: 1px solid rgba(248, 250, 252, 0.2); color: #f8fafc; }
-        .dark-mode .capability-card__link { 
-          border: 1px solid rgba(56, 189, 248, 0.4); 
-          padding: 0.5rem 1rem; 
-          border-radius: 8px; 
+        .dark-mode .capability-card__link {
+          border: 1px solid rgba(56, 189, 248, 0.4);
+          padding: 0.5rem 1rem;
+          border-radius: 8px;
         }
 
         /* Resalte dinámico del botón de cambio de tema */
@@ -267,10 +296,10 @@ function Website() {
           color: #191c1d;
         }
         .dark-mode .job-form__field label { color: #94a3b8; }
-        .dark-mode .job-form__field input, .dark-mode .job-form__field select { 
-          background-color: #0f172a; 
-          border-color: #334155; 
-          color: #f8fafc; 
+        .dark-mode .job-form__field input, .dark-mode .job-form__field select {
+          background-color: #0f172a;
+          border-color: #334155;
+          color: #f8fafc;
         }
         .job-submit-btn { margin-top: 0.5rem; width: 100%; border: none; }
 
@@ -296,11 +325,11 @@ function Website() {
           padding: 2.5rem !important;
         }
         .specs-modal-section { margin-bottom: 2rem; text-align: left; }
-        .specs-modal-section h4 { 
-          display: flex; 
-          align-items: center; 
-          gap: 0.5rem; 
-          color: #d32f2f; 
+        .specs-modal-section h4 {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          color: #d32f2f;
           margin-bottom: 1rem;
           border-bottom: 2px solid #f1f5f9;
           padding-bottom: 0.5rem;
@@ -328,23 +357,23 @@ function Website() {
         .dark-mode .specs-scroll-area::-webkit-scrollbar-thumb {
           background: #475569;
         }
-        
+
         .specs-table-container { overflow-x: auto; margin-top: 1rem; }
         .specs-mini-table {
           width: 100%;
           border-collapse: collapse;
           font-size: 0.9rem;
         }
-        .specs-mini-table th { 
-          background: #f8fafc; 
-          padding: 0.8rem; 
-          text-align: left; 
+        .specs-mini-table th {
+          background: #f8fafc;
+          padding: 0.8rem;
+          text-align: left;
           color: #475569;
         }
         .dark-mode .specs-mini-table th { background: #0f172a; color: #94a3b8; }
-        .specs-mini-table td { 
-          padding: 0.8rem; 
-          border-bottom: 1px solid #f1f5f9; 
+        .specs-mini-table td {
+          padding: 0.8rem;
+          border-bottom: 1px solid #f1f5f9;
         }
         .dark-mode .specs-mini-table td { border-color: #334155; }
 
@@ -453,17 +482,19 @@ function Website() {
         }
       `}</style>
 
-      <header className={`topbar ${headerElevated ? 'topbar--scrolled' : ''}`}>
+      <header className={`topbar ${headerElevated ? "topbar--scrolled" : ""}`}>
         <div className="topbar__brand-group">
           {/* El interruptor de tema ahora está aquí, reemplazando al menú */}
-          <button 
-            className="topbar__icon-button theme-toggle" 
-            type="button" 
+          <button
+            className="topbar__icon-button theme-toggle"
+            type="button"
             onClick={() => setIsDarkMode(!isDarkMode)}
-            aria-label={isDarkMode ? 'Activar modo claro' : 'Activar modo oscuro'}
+            aria-label={
+              isDarkMode ? "Activar modo claro" : "Activar modo oscuro"
+            }
           >
             <span className="material-symbols-outlined">
-              {isDarkMode ? 'dark_mode' : 'light_mode'}
+              {isDarkMode ? "dark_mode" : "light_mode"}
             </span>
           </button>
           <h1 className="topbar__brand">Sealing Products C.A.</h1>
@@ -471,19 +502,27 @@ function Website() {
 
         <nav className="topbar__nav">
           {NAV_LINKS.map((link) => (
-            <a key={link.label} className="topbar__link" href={link.href} onClick={(e) => handleNavLinkClick(e, link.href)}>
-              {link.label}
+            <a
+              key={link.label}
+              className="topbar__link topbar__link--with-icon"
+              href={link.href}
+              onClick={(e) => handleNavLinkClick(e, link.href)}
+            >
+              <span className="material-symbols-outlined topbar__link-icon">
+                {link.icon}
+              </span>
+              <span className="topbar__link-label">{link.label}</span>
             </a>
           ))}
         </nav>
       </header>
 
       <div
-        className={`drawer-overlay ${drawerOpen ? 'drawer-overlay--visible' : ''}`}
+        className={`drawer-overlay ${drawerOpen ? "drawer-overlay--visible" : ""}`}
         onClick={() => setDrawerOpen(false)}
       />
 
-      <aside className={`drawer ${drawerOpen ? 'drawer--open' : ''}`}>
+      <aside className={`drawer ${drawerOpen ? "drawer--open" : ""}`}>
         <div className="drawer__header">
           <div>
             <p className="drawer__eyebrow">Industrial Solutions</p>
@@ -499,8 +538,15 @@ function Website() {
         </div>
         <nav className="drawer__nav">
           {DRAWER_LINKS.map((item) => (
-            <a key={item.label} href={item.href} className="drawer__link" onClick={(e) => handleNavLinkClick(e, item.href)}>
-              <span className="material-symbols-outlined drawer__link-icon">{item.icon}</span>
+            <a
+              key={item.label}
+              href={item.href}
+              className="drawer__link"
+              onClick={(e) => handleNavLinkClick(e, item.href)}
+            >
+              <span className="material-symbols-outlined drawer__link-icon">
+                {item.icon}
+              </span>
               <span>{item.label}</span>
             </a>
           ))}
@@ -518,13 +564,28 @@ function Website() {
           <span className="hero-badge">Est. 1995</span>
           <h2 className="hero-title">Líderes en Sellado Industrial</h2>
           <p className="hero-copy">
-            Fabricación de empaquetaduras de motor y tapa válvulas con precisión milimétrica bajo los más altos estándares internacionales de calidad.
+            Fabricación de empaquetaduras de motor y tapa válvulas con precisión
+            milimétrica bajo los más altos estándares internacionales de
+            calidad.
           </p>
           <div className="hero-actions">
-            <button className="hero-button hero-button--primary" type="button" onClick={() => setCatalogModalOpen(true)}>
+            <button
+              className="hero-button hero-button--primary"
+              type="button"
+              onClick={() => setCatalogModalOpen(true)}
+            >
               Explorar Catálogo
             </button>
-            <a href="#careers" className="hero-button hero-button--secondary" style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
+            <a
+              href="#careers"
+              className="hero-button hero-button--secondary"
+              style={{
+                textDecoration: "none",
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
               Postular Puesto
             </a>
           </div>
@@ -564,7 +625,9 @@ function Website() {
               alt="Detalle de empaquetadura de alta precisión"
             />
             <div className="about-icon-card">
-              <span className="material-symbols-outlined about-icon">engineering</span>
+              <span className="material-symbols-outlined about-icon">
+                engineering
+              </span>
             </div>
           </div>
 
@@ -572,24 +635,40 @@ function Website() {
             <p className="eyebrow">Excelencia en Cada Fibra</p>
             <h3 className="section-heading">Quiénes Somos</h3>
             <p className="section-text">
-              Desde 1995, Sealing Products C.A. ha establecido el estándar de oro en la manufactura de componentes de sellado industrial. Nuestra trayectoria se define por una búsqueda incansable de la perfección técnica y la fiabilidad.
+              Desde 1995, Sealing Products C.A. ha establecido el estándar de
+              oro en la manufactura de componentes de sellado industrial.
+              Nuestra trayectoria se define por una búsqueda incansable de la
+              perfección técnica y la fiabilidad.
             </p>
             <p className="section-text">
-              Nos especializamos en la creación de empaquetaduras de motor y tapa válvulas que operan en las condiciones más exigentes. Utilizando maquinaria de última generación y procesos certificados internacionalmente, garantizamos que cada producto que sale de nuestra planta cumpla con las tolerancias más estrictas del mercado.
+              Nos especializamos en la creación de empaquetaduras de motor y
+              tapa válvulas que operan en las condiciones más exigentes.
+              Utilizando maquinaria de última generación y procesos certificados
+              internacionalmente, garantizamos que cada producto que sale de
+              nuestra planta cumpla con las tolerancias más estrictas del
+              mercado.
             </p>
             <div className="about-features">
               <div className="feature-item">
-                <span className="material-symbols-outlined feature-icon">check_circle</span>
+                <span className="material-symbols-outlined feature-icon">
+                  check_circle
+                </span>
                 <div>
                   <p className="feature-title">Precisión Milimétrica</p>
-                  <p className="feature-text">Tolerancias ajustadas a planos originales.</p>
+                  <p className="feature-text">
+                    Tolerancias ajustadas a planos originales.
+                  </p>
                 </div>
               </div>
               <div className="feature-item">
-                <span className="material-symbols-outlined feature-icon">language</span>
+                <span className="material-symbols-outlined feature-icon">
+                  language
+                </span>
                 <div>
                   <p className="feature-title">Estándar Global</p>
-                  <p className="feature-text">Materiales certificados internacionalmente.</p>
+                  <p className="feature-text">
+                    Materiales certificados internacionalmente.
+                  </p>
                 </div>
               </div>
             </div>
@@ -602,7 +681,8 @@ function Website() {
           <div className="capabilities-intro">
             <h3 className="section-heading">Capacidades Técnicas</h3>
             <p className="section-subtitle">
-              Soportando la industria con ingeniería de alto nivel y materiales de vanguardia.
+              Soportando la industria con ingeniería de alto nivel y materiales
+              de vanguardia.
             </p>
           </div>
 
@@ -614,15 +694,20 @@ function Website() {
                 alt="Capacidad industrial moderna"
               />
               <div className="capability-card__content">
-                <h4 className="capability-card__title">Ingeniería de Reversa</h4>
+                <h4 className="capability-card__title">
+                  Ingeniería de Reversa
+                </h4>
                 <p className="capability-card__text">
-                  Capacidad de replicar componentes críticos con exactitud OEM para equipos descontinuados o especializados.
+                  Capacidad de replicar componentes críticos con exactitud OEM
+                  para equipos descontinuados o especializados.
                 </p>
               </div>
             </div>
 
             <div className="capability-card capability-card--small capability-card--accent">
-              <span className="material-symbols-outlined capability-card__icon-large">biotech</span>
+              <span className="material-symbols-outlined capability-card__icon-large">
+                biotech
+              </span>
               <h4 className="capability-card__title">Laboratorio Propio</h4>
               <p className="capability-card__text">
                 Pruebas de estrés térmico y químico en cada lote.
@@ -630,10 +715,13 @@ function Website() {
             </div>
 
             <div className="capability-card capability-card--small capability-card--accent">
-              <span className="material-symbols-outlined capability-card__icon-large">local_shipping</span>
+              <span className="material-symbols-outlined capability-card__icon-large">
+                local_shipping
+              </span>
               <h4 className="capability-card__title">Distribución Nacional</h4>
               <p className="capability-card__text">
-                Logística integrada para despachos a nivel nacional en tiempo récord.
+                Logística integrada para despachos a nivel nacional en tiempo
+                récord.
               </p>
             </div>
           </div>
@@ -645,7 +733,8 @@ function Website() {
           <div className="products-header">
             <h3 className="section-heading">Productos Destacados</h3>
             <p className="section-subtitle">
-              Descubra nuestras soluciones de sellado industrial diseñadas para altas exigencias.
+              Descubra nuestras soluciones de sellado industrial diseñadas para
+              altas exigencias.
             </p>
           </div>
 
@@ -658,7 +747,10 @@ function Website() {
               />
               <div>
                 <h4>Estoperas</h4>
-                <p>Sellos robustos para retenes de ejes y bombas, con durabilidad industrial.</p>
+                <p>
+                  Sellos robustos para retenes de ejes y bombas, con durabilidad
+                  industrial.
+                </p>
               </div>
             </article>
             <article className="product-card">
@@ -669,7 +761,10 @@ function Website() {
               />
               <div>
                 <h4>Sellos de Válvulas</h4>
-                <p>Empaquetaduras de alta precisión para tapas de válvula y espacios críticos.</p>
+                <p>
+                  Empaquetaduras de alta precisión para tapas de válvula y
+                  espacios críticos.
+                </p>
               </div>
             </article>
             <article className="product-card">
@@ -680,7 +775,10 @@ function Website() {
               />
               <div>
                 <h4>Oring</h4>
-                <p>Juntas tóricas resistentes a altas temperaturas y fluidos agresivos.</p>
+                <p>
+                  Juntas tóricas resistentes a altas temperaturas y fluidos
+                  agresivos.
+                </p>
               </div>
             </article>
             <article className="product-card">
@@ -691,7 +789,10 @@ function Website() {
               />
               <div>
                 <h4>Tapa Válvulas</h4>
-                <p>Empaquetaduras y sellos para tapas de válvula con ajuste perfecto.</p>
+                <p>
+                  Empaquetaduras y sellos para tapas de válvula con ajuste
+                  perfecto.
+                </p>
               </div>
             </article>
             <article className="product-card">
@@ -702,7 +803,10 @@ function Website() {
               />
               <div>
                 <h4>Collarines</h4>
-                <p>Componentes de sello para retenes y guías de cojinete con acabado preciso.</p>
+                <p>
+                  Componentes de sello para retenes y guías de cojinete con
+                  acabado preciso.
+                </p>
               </div>
             </article>
           </div>
@@ -714,38 +818,77 @@ function Website() {
           <div className="join-us-grid">
             <div className="join-us-content">
               <p className="eyebrow">Carreras en Sealing Products</p>
-              <h2 className="section-heading">Únete a nuestro equipo de expertos</h2>
-              <p className="section-text" style={{ fontSize: '1.1rem', marginBottom: '2rem' }}>
-                Estamos en la búsqueda constante de profesionales apasionados por la precisión y la excelencia industrial. 
-                Si quieres ser parte de una empresa con más de 30 años de trayectoria fabricando soluciones de sellado de alta gama, 
-                esta es tu oportunidad.
+              <h2 className="section-heading">
+                Únete a nuestro equipo de expertos
+              </h2>
+              <p
+                className="section-text"
+                style={{ fontSize: "1.1rem", marginBottom: "2rem" }}
+              >
+                Estamos en la búsqueda constante de profesionales apasionados
+                por la precisión y la excelencia industrial. Si quieres ser
+                parte de una empresa con más de 30 años de trayectoria
+                fabricando soluciones de sellado de alta gama, esta es tu
+                oportunidad.
               </p>
 
-              <div className="cert-highlight" style={{ marginTop: '2rem', textAlign: 'left', borderLeft: '5px solid #d32f2f' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', marginBottom: '0.8rem', color: '#d32f2f' }}>
+              <div
+                className="cert-highlight"
+                style={{
+                  marginTop: "2rem",
+                  textAlign: "left",
+                  borderLeft: "5px solid #d32f2f",
+                }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.8rem",
+                    marginBottom: "0.8rem",
+                    color: "#d32f2f",
+                  }}
+                >
                   <span className="material-symbols-outlined">campaign</span>
-                  <span style={{ fontWeight: '700', fontSize: '0.9rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                    {notice.name && notice.name !== 'none' && notice.name !== 'loading' 
-                      ? notice.name 
-                      : 'Aviso de Reclutamiento'}
+                  <span
+                    style={{
+                      fontWeight: "700",
+                      fontSize: "0.9rem",
+                      textTransform: "uppercase",
+                      letterSpacing: "0.05em",
+                    }}
+                  >
+                    {notice.name &&
+                    notice.name !== "none" &&
+                    notice.name !== "loading"
+                      ? notice.name
+                      : "Aviso de Reclutamiento"}
                   </span>
                 </div>
-                <p style={{ fontSize: '1rem', lineHeight: '1.6', margin: 0, fontWeight: '500', color: isDarkMode ? '#e2e8f0' : '#334155' }}>
+                <p
+                  style={{
+                    fontSize: "1rem",
+                    lineHeight: "1.6",
+                    margin: 0,
+                    fontWeight: "500",
+                    color: isDarkMode ? "#e2e8f0" : "#334155",
+                  }}
+                >
                   {notice.note || "Cargando aviso..."}
                 </p>
               </div>
 
               {/* Botón dinámico: Solo aparece si el ID no es 1 (Aviso de "No hay vacantes") */}
               {notice.id && Number(notice.id) !== 1 && (
-                <button 
-                  className="hero-button hero-button--primary" 
-                  style={{ 
-                    marginTop: '1.5rem', 
-                    width: 'fit-content', 
-                    display: 'flex', 
-                    alignItems: 'center', 
-                    gap: '0.8rem',
-                    boxShadow: '0 10px 15px -3px rgba(211, 47, 47, 0.2)'
+                <button
+                  className="hero-button hero-button--primary"
+                  style={{
+                    marginTop: "1.5rem",
+                    width: "fit-content",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.8rem",
+                    boxShadow: "0 10px 15px -3px rgba(211, 47, 47, 0.2)",
                   }}
                   onClick={() => setJobModalOpen(true)}
                 >
@@ -763,17 +906,21 @@ function Website() {
           <div className="footer-brand">
             <h4 className="footer-title">Sealing Products C.A.</h4>
             <p className="footer-copy">
-              Comprometidos con la durabilidad de su maquinaria desde hace más de tres décadas. Calidad que sella el éxito.
+              Comprometidos con la durabilidad de su maquinaria desde hace más
+              de tres décadas. Calidad que sella el éxito.
             </p>
             <div className="footer-social">
               <a className="footer-social-link" href="#" aria-label="Compartir">
                 <span className="material-symbols-outlined">share</span>
               </a>
-              <a 
-                className="footer-social-link" 
-                href="#location" 
+              <a
+                className="footer-social-link"
+                href="#location"
                 aria-label="Ubicación"
-                onClick={(e) => { e.preventDefault(); setLocationModalOpen(true); }}
+                onClick={(e) => {
+                  e.preventDefault();
+                  setLocationModalOpen(true);
+                }}
               >
                 <span className="material-symbols-outlined">location_on</span>
               </a>
@@ -784,16 +931,43 @@ function Website() {
             <div>
               <h5 className="footer-section-title">Recursos</h5>
               <nav className="footer-links">
-                <a href="#specs" onClick={(e) => { e.preventDefault(); setSpecsModalOpen(true); }}>Especificaciones técnicas</a>
-                <a href="#providers" onClick={(e) => { e.preventDefault(); setProvidersModalOpen(true); }}>Proveedores</a>
-                <a href="#privacy" onClick={(e) => { e.preventDefault(); setPrivacyModalOpen(true); }}>Políticas de privacidad</a>
+                <a
+                  href="#specs"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setSpecsModalOpen(true);
+                  }}
+                >
+                  Especificaciones técnicas
+                </a>
+                <a
+                  href="#providers"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setProvidersModalOpen(true);
+                  }}
+                >
+                  Proveedores
+                </a>
+                <a
+                  href="#privacy"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setPrivacyModalOpen(true);
+                  }}
+                >
+                  Políticas de privacidad
+                </a>
               </nav>
             </div>
             <div>
               <h5 className="footer-section-title">Contacto</h5>
               <p className="footer-contact">
-                Zona Industrial Paramillo, Complejo Fabilosa, Galpón 1 , San Cristóbal, Táchira, Venezuela<br />
-                ventas@sealingproducts.com<br />
+                Zona Industrial Paramillo, Complejo Fabilosa, Galpón 1 , San
+                Cristóbal, Táchira, Venezuela
+                <br />
+                ventas@sealingproducts.com
+                <br />
                 +58 (212) 555-0123
               </p>
             </div>
@@ -802,30 +976,57 @@ function Website() {
 
         <div className="footer-bottom">
           <p>© 2026 Sealing Products C.A.</p>
-          <p style={{ maxWidth: '800px', margin: '0 auto', fontSize: '0.75rem', opacity: 0.8, lineHeight: '1.4' }}>Aclaración legal: Esta página <strong>NO ES OFICIAL</strong>. Se trata exclusivamente de un proyecto universitario con fines académicos inspirado en la empresa Sealing Products C.A.</p>
+          <p
+            style={{
+              maxWidth: "800px",
+              margin: "0 auto",
+              fontSize: "0.75rem",
+              opacity: 0.8,
+              lineHeight: "1.4",
+            }}
+          >
+            Aclaración legal: Esta página <strong>NO ES OFICIAL</strong>. Se
+            trata exclusivamente de un proyecto universitario con fines
+            académicos inspirado en la empresa Sealing Products C.A.
+          </p>
         </div>
       </footer>
 
       {/* Modal de Contacto */}
       {contactModalOpen && (
-        <div className="contact-overlay" onClick={() => setContactModalOpen(false)}>
+        <div
+          className="contact-overlay"
+          onClick={() => setContactModalOpen(false)}
+        >
           <div className="contact-modal" onClick={(e) => e.stopPropagation()}>
-            <button className="contact-close" onClick={() => setContactModalOpen(false)}>
+            <button
+              className="contact-close"
+              onClick={() => setContactModalOpen(false)}
+            >
               <span className="material-symbols-outlined">close</span>
             </button>
             <h3 className="contact-title">Datos de Contacto</h3>
             <div className="contact-info-list">
               <div className="contact-item">
                 <span className="material-symbols-outlined">location_on</span>
-                <div><p className="contact-label">Ubicación</p><p className="contact-value">Tachira, Venezuela</p></div>
+                <div>
+                  <p className="contact-label">Ubicación</p>
+                  <p className="contact-value">Tachira, Venezuela</p>
+                </div>
               </div>
               <div className="contact-item">
                 <span className="material-symbols-outlined">mail</span>
-                <div><p className="contact-label">Correo de contacto</p><p className="contact-value">ventas@sealingproducts.com</p></div>
+                <div>
+                  <p className="contact-label">Correo de contacto</p>
+                  <p className="contact-value">ventas@sealingproducts.com</p>
+                </div>
               </div>
               <div className="contact-item">
                 <span className="material-symbols-outlined">call</span>
-                <div><p className="contact-label">Teléfono de contacto</p><p className="contact-value">+58 (212) 555-0123</p></div>
+                <div>
+                  <p className="contact-label">Teléfono de contacto</p>
+                  <p className="contact-value">+58 (212) 555-0123</p>
+                </div>
               </div>
             </div>
           </div>
@@ -834,27 +1035,52 @@ function Website() {
 
       {/* Modal de Especificaciones Técnicas (Overlay) */}
       {specsModalOpen && (
-        <div className="contact-overlay" onClick={() => setSpecsModalOpen(false)}>
-          <div className="contact-modal specs-modal" onClick={(e) => e.stopPropagation()}>
-            <button className="contact-close" onClick={() => setSpecsModalOpen(false)}>
+        <div
+          className="contact-overlay"
+          onClick={() => setSpecsModalOpen(false)}
+        >
+          <div
+            className="contact-modal specs-modal"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              className="contact-close"
+              onClick={() => setSpecsModalOpen(false)}
+            >
               <span className="material-symbols-outlined">close</span>
             </button>
-            
-            <h3 className="contact-title" style={{ marginBottom: '2rem' }}>Ficha Técnica Corporativa</h3>
+
+            <h3 className="contact-title" style={{ marginBottom: "2rem" }}>
+              Ficha Técnica Corporativa
+            </h3>
 
             <div className="specs-scroll-area">
               <div className="specs-modal-section">
-                <h4><span className="material-symbols-outlined">verified</span> Certificación de Calidad</h4>
+                <h4>
+                  <span className="material-symbols-outlined">verified</span>{" "}
+                  Certificación de Calidad
+                </h4>
                 <div className="cert-highlight">
                   <strong>ISO 9001:2015 Certificada</strong>
-                  <p style={{ fontSize: '0.85rem', marginTop: '0.5rem', margin: 0 }}>
-                    Nuestro Sistema de Gestión de Calidad cubre el diseño, fabricación y comercialización de sellos mecánicos, garantizando trazabilidad total desde la materia prima.
+                  <p
+                    style={{
+                      fontSize: "0.85rem",
+                      marginTop: "0.5rem",
+                      margin: 0,
+                    }}
+                  >
+                    Nuestro Sistema de Gestión de Calidad cubre el diseño,
+                    fabricación y comercialización de sellos mecánicos,
+                    garantizando trazabilidad total desde la materia prima.
                   </p>
                 </div>
               </div>
 
               <div className="specs-modal-section">
-                <h4><span className="material-symbols-outlined">straighten</span> Tolerancias de Fabricación</h4>
+                <h4>
+                  <span className="material-symbols-outlined">straighten</span>{" "}
+                  Tolerancias de Fabricación
+                </h4>
                 <div className="specs-table-container">
                   <table className="specs-mini-table">
                     <thead>
@@ -886,10 +1112,16 @@ function Website() {
               </div>
 
               <div className="specs-modal-section">
-                <h4><span className="material-symbols-outlined">science</span> Materiales Disponibles</h4>
-                <p style={{ fontSize: '0.9rem', lineHeight: '1.4' }}>
-                  Trabajamos con compuestos elastoméricos de alto desempeño: <strong>Nitrilo (NBR) No Asbestico</strong> para aceites, 
-                  <strong>Viton (FKM)</strong> para altas temperaturas y químicos, y <strong>Silicona (VMQ)</strong> para grado alimenticio.
+                <h4>
+                  <span className="material-symbols-outlined">science</span>{" "}
+                  Materiales Disponibles
+                </h4>
+                <p style={{ fontSize: "0.9rem", lineHeight: "1.4" }}>
+                  Trabajamos con compuestos elastoméricos de alto desempeño:{" "}
+                  <strong>Nitrilo (NBR) No Asbestico</strong> para aceites,
+                  <strong>Viton (FKM)</strong> para altas temperaturas y
+                  químicos, y <strong>Silicona (VMQ)</strong> para grado
+                  alimenticio.
                 </p>
               </div>
             </div>
@@ -899,45 +1131,96 @@ function Website() {
 
       {/* Modal de Proveedores (Overlay) */}
       {providersModalOpen && (
-        <div className="contact-overlay" onClick={() => setProvidersModalOpen(false)}>
-          <div className="contact-modal specs-modal" onClick={(e) => e.stopPropagation()}>
-            <button className="contact-close" onClick={() => setProvidersModalOpen(false)}>
+        <div
+          className="contact-overlay"
+          onClick={() => setProvidersModalOpen(false)}
+        >
+          <div
+            className="contact-modal specs-modal"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              className="contact-close"
+              onClick={() => setProvidersModalOpen(false)}
+            >
               <span className="material-symbols-outlined">close</span>
             </button>
-            
-            <h3 className="contact-title" style={{ marginBottom: '2rem' }}>Nuestra Red de Proveedores</h3>
+
+            <h3 className="contact-title" style={{ marginBottom: "2rem" }}>
+              Nuestra Red de Proveedores
+            </h3>
 
             <div className="specs-scroll-area">
               <div className="specs-modal-section">
-                <h4><span className="material-symbols-outlined">handshake</span> Aliados Nacionales</h4>
-                <p style={{ fontSize: '0.9rem', lineHeight: '1.6', marginBottom: '1.5rem' }}>
-                  Mantenemos alianzas estratégicas con las distribuidoras y marcas más prestigiosas del país para garantizar que nuestras soluciones de sellado industrial mantengan los más altos estándares de calidad y disponibilidad.
+                <h4>
+                  <span className="material-symbols-outlined">handshake</span>{" "}
+                  Aliados Nacionales
+                </h4>
+                <p
+                  style={{
+                    fontSize: "0.9rem",
+                    lineHeight: "1.6",
+                    marginBottom: "1.5rem",
+                  }}
+                >
+                  Mantenemos alianzas estratégicas con las distribuidoras y
+                  marcas más prestigiosas del país para garantizar que nuestras
+                  soluciones de sellado industrial mantengan los más altos
+                  estándares de calidad y disponibilidad.
                 </p>
-                
+
                 <div className="providers-grid">
                   <div className="provider-item">
-                    <span className="material-symbols-outlined" style={{ marginRight: '0.8rem', color: '#d32f2f' }}>business</span>
+                    <span
+                      className="material-symbols-outlined"
+                      style={{ marginRight: "0.8rem", color: "#d32f2f" }}
+                    >
+                      business
+                    </span>
                     Representaciones insa c.a.
                   </div>
                   <div className="provider-item">
-                    <span className="material-symbols-outlined" style={{ marginRight: '0.8rem', color: '#d32f2f' }}>business</span>
+                    <span
+                      className="material-symbols-outlined"
+                      style={{ marginRight: "0.8rem", color: "#d32f2f" }}
+                    >
+                      business
+                    </span>
                     Representaciones ITALVE 90 c.a.
                   </div>
                   <div className="provider-item">
-                    <span className="material-symbols-outlined" style={{ marginRight: '0.8rem', color: '#d32f2f' }}>business</span>
+                    <span
+                      className="material-symbols-outlined"
+                      style={{ marginRight: "0.8rem", color: "#d32f2f" }}
+                    >
+                      business
+                    </span>
                     ATM Maturin c.a.
                   </div>
                   <div className="provider-item">
-                    <span className="material-symbols-outlined" style={{ marginRight: '0.8rem', color: '#d32f2f' }}>business</span>
+                    <span
+                      className="material-symbols-outlined"
+                      style={{ marginRight: "0.8rem", color: "#d32f2f" }}
+                    >
+                      business
+                    </span>
                     Import convi c.a.
                   </div>
                 </div>
               </div>
 
               <div className="specs-modal-section">
-                <h4><span className="material-symbols-outlined">verified_user</span> Calidad de Suministro</h4>
-                <p style={{ fontSize: '0.9rem' }}>
-                  Todos nuestros proveedores pasan por un riguroso proceso de auditoría técnica, asegurando que los insumos y materias primas cumplan con las especificaciones de ingeniería requeridas por <strong>Sealing Products C.A.</strong>
+                <h4>
+                  <span className="material-symbols-outlined">
+                    verified_user
+                  </span>{" "}
+                  Calidad de Suministro
+                </h4>
+                <p style={{ fontSize: "0.9rem" }}>
+                  Todos nuestros proveedores pasan por un riguroso proceso de
+                  auditoría técnica, asegurando que los insumos y materias
+                  primas cumplan con las especificaciones de ingeniería
+                  requeridas por <strong>Sealing Products C.A.</strong>
                 </p>
               </div>
             </div>
@@ -947,38 +1230,86 @@ function Website() {
 
       {/* Modal de Políticas de Privacidad (Overlay) */}
       {privacyModalOpen && (
-        <div className="contact-overlay" onClick={() => setPrivacyModalOpen(false)}>
-          <div className="contact-modal specs-modal" onClick={(e) => e.stopPropagation()}>
-            <button className="contact-close" onClick={() => setPrivacyModalOpen(false)}>
+        <div
+          className="contact-overlay"
+          onClick={() => setPrivacyModalOpen(false)}
+        >
+          <div
+            className="contact-modal specs-modal"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              className="contact-close"
+              onClick={() => setPrivacyModalOpen(false)}
+            >
               <span className="material-symbols-outlined">close</span>
             </button>
-            
-            <h3 className="contact-title" style={{ marginBottom: '2rem' }}>Políticas de Privacidad</h3>
+
+            <h3 className="contact-title" style={{ marginBottom: "2rem" }}>
+              Políticas de Privacidad
+            </h3>
 
             <div className="specs-scroll-area">
               <div className="specs-modal-section">
-                <h4><span className="material-symbols-outlined">security</span> Protección de Datos</h4>
-                <p style={{ fontSize: '0.9rem', lineHeight: '1.6' }}>
-                  En <strong>Sealing Products C.A.</strong>, la seguridad de su información es nuestra prioridad. Los datos recolectados a través de nuestro sitio web son utilizados exclusivamente para la gestión de solicitudes comerciales, procesos de reclutamiento y mejora de la experiencia del usuario.
+                <h4>
+                  <span className="material-symbols-outlined">security</span>{" "}
+                  Protección de Datos
+                </h4>
+                <p style={{ fontSize: "0.9rem", lineHeight: "1.6" }}>
+                  En <strong>Sealing Products C.A.</strong>, la seguridad de su
+                  información es nuestra prioridad. Los datos recolectados a
+                  través de nuestro sitio web son utilizados exclusivamente para
+                  la gestión de solicitudes comerciales, procesos de
+                  reclutamiento y mejora de la experiencia del usuario.
                 </p>
-                <ul style={{ fontSize: '0.9rem', paddingLeft: '1.2rem', marginTop: '1rem', color: isDarkMode ? '#94a3b8' : '#475569' }}>
-                  <li>No vendemos ni compartimos su información personal con terceros.</li>
-                  <li>Implementamos protocolos de seguridad digital para proteger su identidad.</li>
-                  <li>Usted puede solicitar la eliminación de sus datos en cualquier momento.</li>
+                <ul
+                  style={{
+                    fontSize: "0.9rem",
+                    paddingLeft: "1.2rem",
+                    marginTop: "1rem",
+                    color: isDarkMode ? "#94a3b8" : "#475569",
+                  }}
+                >
+                  <li>
+                    No vendemos ni compartimos su información personal con
+                    terceros.
+                  </li>
+                  <li>
+                    Implementamos protocolos de seguridad digital para proteger
+                    su identidad.
+                  </li>
+                  <li>
+                    Usted puede solicitar la eliminación de sus datos en
+                    cualquier momento.
+                  </li>
                 </ul>
               </div>
 
               <div className="specs-modal-section">
-                <h4><span className="material-symbols-outlined">visibility_off</span> Confidencialidad Industrial</h4>
-                <p style={{ fontSize: '0.9rem', lineHeight: '1.6' }}>
-                  Entendemos el valor de su propiedad intelectual. Toda información técnica, planos o muestras suministradas para la fabricación de piezas especiales se maneja bajo estrictos acuerdos de confidencialidad y secreto industrial.
+                <h4>
+                  <span className="material-symbols-outlined">
+                    visibility_off
+                  </span>{" "}
+                  Confidencialidad Industrial
+                </h4>
+                <p style={{ fontSize: "0.9rem", lineHeight: "1.6" }}>
+                  Entendemos el valor de su propiedad intelectual. Toda
+                  información técnica, planos o muestras suministradas para la
+                  fabricación de piezas especiales se maneja bajo estrictos
+                  acuerdos de confidencialidad y secreto industrial.
                 </p>
               </div>
 
               <div className="specs-modal-section">
-                <h4><span className="material-symbols-outlined">gavel</span> Consentimiento</h4>
-                <p style={{ fontSize: '0.9rem', lineHeight: '1.6' }}>
-                  Al utilizar nuestros servicios de contacto o postulación, usted acepta el tratamiento de sus datos bajo estos términos. Para cualquier consulta legal, puede escribirnos a <strong>ventas@sealingproducts.com</strong>.
+                <h4>
+                  <span className="material-symbols-outlined">gavel</span>{" "}
+                  Consentimiento
+                </h4>
+                <p style={{ fontSize: "0.9rem", lineHeight: "1.6" }}>
+                  Al utilizar nuestros servicios de contacto o postulación,
+                  usted acepta el tratamiento de sus datos bajo estos términos.
+                  Para cualquier consulta legal, puede escribirnos a{" "}
+                  <strong>ventas@sealingproducts.com</strong>.
                 </p>
               </div>
             </div>
@@ -988,64 +1319,123 @@ function Website() {
 
       {/* Modal de Catálogo (Explorar Catálogo) */}
       {catalogModalOpen && (
-        <div className="contact-overlay" onClick={() => setCatalogModalOpen(false)}>
-          <div className="contact-modal catalog-modal" onClick={(e) => e.stopPropagation()}>
-            <button className="contact-close" onClick={() => setCatalogModalOpen(false)}>
+        <div
+          className="contact-overlay"
+          onClick={() => setCatalogModalOpen(false)}
+        >
+          <div
+            className="contact-modal catalog-modal"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              className="contact-close"
+              onClick={() => setCatalogModalOpen(false)}
+            >
               <span className="material-symbols-outlined">close</span>
             </button>
-            
-            <h3 className="contact-title" style={{ marginBottom: '1.5rem' }}>Portafolio de Productos Destacados</h3>
-            <p style={{ marginBottom: '2rem', color: isDarkMode ? '#94a3b8' : '#64748b' }}>
-              Soluciones de ingeniería diseñadas para garantizar la estanqueidad y eficiencia de su maquinaria industrial.
+
+            <h3 className="contact-title" style={{ marginBottom: "1.5rem" }}>
+              Portafolio de Productos Destacados
+            </h3>
+            <p
+              style={{
+                marginBottom: "2rem",
+                color: isDarkMode ? "#94a3b8" : "#64748b",
+              }}
+            >
+              Soluciones de ingeniería diseñadas para garantizar la estanqueidad
+              y eficiencia de su maquinaria industrial.
             </p>
 
             <div className="specs-scroll-area">
               <div className="catalog-grid">
                 <article className="catalog-item">
-                  <img src={estoperaImg} alt="Estopera" className="catalog-item__img" />
+                  <img
+                    src={estoperaImg}
+                    alt="Estopera"
+                    className="catalog-item__img"
+                  />
                   <div className="catalog-item__info">
                     <h4 className="catalog-item__title">Estoperas</h4>
-                    <p className="catalog-item__desc">Sellos robustos para retenes de ejes y bombas, fabricados en nitrilo de alta resistencia.</p>
+                    <p className="catalog-item__desc">
+                      Sellos robustos para retenes de ejes y bombas, fabricados
+                      en nitrilo de alta resistencia.
+                    </p>
                   </div>
                 </article>
 
                 <article className="catalog-item">
-                  <img src={tapavalvulaImg} alt="Sello de válvula" className="catalog-item__img" />
+                  <img
+                    src={tapavalvulaImg}
+                    alt="Sello de válvula"
+                    className="catalog-item__img"
+                  />
                   <div className="catalog-item__info">
                     <h4 className="catalog-item__title">Sellos de Válvulas</h4>
-                    <p className="catalog-item__desc">Empaquetaduras de precisión para tapas de válvula con resistencia térmica superior.</p>
+                    <p className="catalog-item__desc">
+                      Empaquetaduras de precisión para tapas de válvula con
+                      resistencia térmica superior.
+                    </p>
                   </div>
                 </article>
 
                 <article className="catalog-item">
-                  <img src={oringImg} alt="Oring" className="catalog-item__img" />
+                  <img
+                    src={oringImg}
+                    alt="Oring"
+                    className="catalog-item__img"
+                  />
                   <div className="catalog-item__info">
                     <h4 className="catalog-item__title">Orings</h4>
-                    <p className="catalog-item__desc">Juntas tóricas de Vitón y Silicona para aplicaciones químicas y de alta presión.</p>
+                    <p className="catalog-item__desc">
+                      Juntas tóricas de Vitón y Silicona para aplicaciones
+                      químicas y de alta presión.
+                    </p>
                   </div>
                 </article>
 
                 <article className="catalog-item">
-                  <img src={sellovalvulaImg} alt="Tapa Válvulas" className="catalog-item__img" />
+                  <img
+                    src={sellovalvulaImg}
+                    alt="Tapa Válvulas"
+                    className="catalog-item__img"
+                  />
                   <div className="catalog-item__info">
                     <h4 className="catalog-item__title">Tapa Válvulas</h4>
-                    <p className="catalog-item__desc">Empaquetaduras con ajuste OEM diseñadas para prevenir fugas de aceite en el motor.</p>
+                    <p className="catalog-item__desc">
+                      Empaquetaduras con ajuste OEM diseñadas para prevenir
+                      fugas de aceite en el motor.
+                    </p>
                   </div>
                 </article>
 
                 <article className="catalog-item">
-                  <img src={collarinImg} alt="Collarín" className="catalog-item__img" />
+                  <img
+                    src={collarinImg}
+                    alt="Collarín"
+                    className="catalog-item__img"
+                  />
                   <div className="catalog-item__info">
                     <h4 className="catalog-item__title">Collarines</h4>
-                    <p className="catalog-item__desc">Sellos hidráulicos especializados para vástagos y pistones de alta fricción.</p>
+                    <p className="catalog-item__desc">
+                      Sellos hidráulicos especializados para vástagos y pistones
+                      de alta fricción.
+                    </p>
                   </div>
                 </article>
 
                 <article className="catalog-item">
-                  <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuAy56S-3rFq9bNdszjdGqeHiWGaa9XWsK3ymeC-3BYgLICY3odniQ4vhkfB5R70XKFc2ZIyY3GmOZUpXuWWWox3zoYgL2UcbTxKJCdgU0WboBlAQXdc8UaeXA9Ve83C7A5bm8q0xndTKV9to7fYGadpZBKULiWdd136HEqPA3CL_BsG5oFBhIYeitF5YCj0KE3m99G24OQDeKdji6-wb46K2AfN5FsItPw70xguYaifu-n56CCVCOhRx73JJM3nBlhkqWDG0e0jBcA" alt="Especiales" className="catalog-item__img" />
+                  <img
+                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuAy56S-3rFq9bNdszjdGqeHiWGaa9XWsK3ymeC-3BYgLICY3odniQ4vhkfB5R70XKFc2ZIyY3GmOZUpXuWWWox3zoYgL2UcbTxKJCdgU0WboBlAQXdc8UaeXA9Ve83C7A5bm8q0xndTKV9to7fYGadpZBKULiWdd136HEqPA3CL_BsG5oFBhIYeitF5YCj0KE3m99G24OQDeKdji6-wb46K2AfN5FsItPw70xguYaifu-n56CCVCOhRx73JJM3nBlhkqWDG0e0jBcA"
+                    alt="Especiales"
+                    className="catalog-item__img"
+                  />
                   <div className="catalog-item__info">
                     <h4 className="catalog-item__title">Piezas Especiales</h4>
-                    <p className="catalog-item__desc">Desarrollo de sellos a medida mediante ingeniería de reversa para equipos descontinuados.</p>
+                    <p className="catalog-item__desc">
+                      Desarrollo de sellos a medida mediante ingeniería de
+                      reversa para equipos descontinuados.
+                    </p>
                   </div>
                 </article>
               </div>
@@ -1056,16 +1446,33 @@ function Website() {
 
       {/* Modal de Ubicación (Google Maps) */}
       {locationModalOpen && (
-        <div className="contact-overlay" onClick={() => setLocationModalOpen(false)}>
-          <div className="contact-modal" style={{ maxWidth: '800px', width: '95%' }} onClick={(e) => e.stopPropagation()}>
-            <button className="contact-close" onClick={() => setLocationModalOpen(false)}>
+        <div
+          className="contact-overlay"
+          onClick={() => setLocationModalOpen(false)}
+        >
+          <div
+            className="contact-modal"
+            style={{ maxWidth: "800px", width: "95%" }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              className="contact-close"
+              onClick={() => setLocationModalOpen(false)}
+            >
               <span className="material-symbols-outlined">close</span>
             </button>
             <h3 className="contact-title">Nuestra Ubicación</h3>
-            <p style={{ fontSize: '0.9rem', color: isDarkMode ? '#94a3b8' : '#64748b', marginBottom: '1rem' }}>
-              Zona Industrial Paramillo, Complejo Fabilosa, Galpón 1, San Cristóbal.
+            <p
+              style={{
+                fontSize: "0.9rem",
+                color: isDarkMode ? "#94a3b8" : "#64748b",
+                marginBottom: "1rem",
+              }}
+            >
+              Zona Industrial Paramillo, Complejo Fabilosa, Galpón 1, San
+              Cristóbal.
             </p>
-            
+
             <div className="map-container">
               <iframe
                 src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3954.2705!2d-72.2173!3d7.7712!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8e6669938883737b%3A0x6b6d5f7f8f8f8f8f!2sZona%20Industrial%20Paramillo!5e0!3m2!1ses!2sve!4v1716912345678!5m2!1ses!2sve"
@@ -1079,13 +1486,19 @@ function Website() {
               ></iframe>
             </div>
 
-            <div style={{ marginTop: '1.5rem', textAlign: 'center' }}>
-              <a 
-                href="https://maps.app.goo.gl/yjrD4SUJbYG9yHNk8" 
-                target="_blank" 
+            <div style={{ marginTop: "1.5rem", textAlign: "center" }}>
+              <a
+                href="https://maps.app.goo.gl/yjrD4SUJbYG9yHNk8"
+                target="_blank"
                 rel="noopener noreferrer"
                 className="hero-button hero-button--primary"
-                style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', textDecoration: 'none', justifyContent: 'center' }}
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "0.5rem",
+                  textDecoration: "none",
+                  justifyContent: "center",
+                }}
               >
                 <span className="material-symbols-outlined">directions</span>
                 ¿Cómo llegar?
@@ -1097,71 +1510,154 @@ function Website() {
 
       {/* Modal de Postulación */}
       {jobModalOpen && (
-        <div className="contact-overlay" onClick={() => { setJobModalOpen(false); setPostulationSuccess(false); }}>
-          <div className="contact-modal" style={{ maxWidth: '500px', width: '95%' }} onClick={(e) => e.stopPropagation()}>
-            <button className="contact-close" onClick={() => { setJobModalOpen(false); setPostulationSuccess(false); }}>
+        <div
+          className="contact-overlay"
+          onClick={() => {
+            setJobModalOpen(false);
+            setPostulationSuccess(false);
+          }}
+        >
+          <div
+            className="contact-modal"
+            style={{ maxWidth: "500px", width: "95%" }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              className="contact-close"
+              onClick={() => {
+                setJobModalOpen(false);
+                setPostulationSuccess(false);
+              }}
+            >
               <span className="material-symbols-outlined">close</span>
             </button>
-            
+
             {postulationSuccess ? (
-              <div style={{ textAlign: 'center', padding: '1rem' }}>
-                <span className="material-symbols-outlined" style={{ fontSize: '4.5rem', color: '#10b981', marginBottom: '1rem' }}>
+              <div style={{ textAlign: "center", padding: "1rem" }}>
+                <span
+                  className="material-symbols-outlined"
+                  style={{
+                    fontSize: "4.5rem",
+                    color: "#10b981",
+                    marginBottom: "1rem",
+                  }}
+                >
                   check_circle
                 </span>
-                <h3 className="catalog-item__title" style={{ fontSize: '1.5rem' }}>¡Postulación Enviada!</h3>
-                <p className="section-text" style={{ margin: '1rem 0 2rem' }}>
-                  Hemos recibido tus datos con éxito. Nuestro equipo de recursos humanos evaluará tu perfil y te contactará pronto.
+                <h3
+                  className="catalog-item__title"
+                  style={{ fontSize: "1.5rem" }}
+                >
+                  ¡Postulación Enviada!
+                </h3>
+                <p className="section-text" style={{ margin: "1rem 0 2rem" }}>
+                  Hemos recibido tus datos con éxito. Nuestro equipo de recursos
+                  humanos evaluará tu perfil y te contactará pronto.
                 </p>
-                <button 
-                  className="hero-button hero-button--primary" 
-                  style={{ width: '100%' }}
-                  onClick={() => { setJobModalOpen(false); setPostulationSuccess(false); }}
+                <button
+                  className="hero-button hero-button--primary"
+                  style={{ width: "100%" }}
+                  onClick={() => {
+                    setJobModalOpen(false);
+                    setPostulationSuccess(false);
+                  }}
                 >
                   Cerrar ventana
                 </button>
               </div>
             ) : (
               <>
-                <h3 className="contact-title" style={{ marginBottom: '0.5rem' }}>Formulario de Selección</h3>
-                <p style={{ fontSize: '0.85rem', color: '#64748b', marginBottom: '1.5rem', textAlign: 'center' }}>
+                <h3
+                  className="contact-title"
+                  style={{ marginBottom: "0.5rem" }}
+                >
+                  Formulario de Selección
+                </h3>
+                <p
+                  style={{
+                    fontSize: "0.85rem",
+                    color: "#64748b",
+                    marginBottom: "1.5rem",
+                    textAlign: "center",
+                  }}
+                >
                   Complete sus datos para postularse a la vacante actual.
                 </p>
                 <form className="job-form" onSubmit={handleJobSubmit}>
                   <div className="job-form__row">
                     <div className="job-form__field">
                       <label>Nombre</label>
-                      <input type="text" name="name" value={jobFormData.name} onChange={handleJobChange} placeholder="Nombre" required />
+                      <input
+                        type="text"
+                        name="name"
+                        value={jobFormData.name}
+                        onChange={handleJobChange}
+                        placeholder="Nombre"
+                        required
+                      />
                     </div>
                     <div className="job-form__field">
                       <label>Apellido</label>
-                      <input type="text" name="lastname" value={jobFormData.lastname} onChange={handleJobChange} placeholder="Apellido" required />
+                      <input
+                        type="text"
+                        name="lastname"
+                        value={jobFormData.lastname}
+                        onChange={handleJobChange}
+                        placeholder="Apellido"
+                        required
+                      />
                     </div>
                   </div>
                   <div className="job-form__field">
                     <label>Cédula de Identidad</label>
-                    <input type="text" name="ci" value={jobFormData.ci} onChange={handleJobChange} placeholder="V-00.000.000" required />
+                    <input
+                      type="text"
+                      name="ci"
+                      value={jobFormData.ci}
+                      onChange={handleJobChange}
+                      placeholder="V-00.000.000"
+                      required
+                    />
                   </div>
                   <div className="job-form__field">
                     <label>Correo Electrónico</label>
-                    <input type="email" name="email" value={jobFormData.email} onChange={handleJobChange} placeholder="ejemplo@correo.com" required />
+                    <input
+                      type="email"
+                      name="email"
+                      value={jobFormData.email}
+                      onChange={handleJobChange}
+                      placeholder="ejemplo@correo.com"
+                      required
+                    />
                   </div>
                   <div className="job-form__field">
                     <label>Cargo de interés</label>
-                    <select name="rol" value={jobFormData.rol} onChange={handleJobChange} required>
+                    <select
+                      name="rol"
+                      value={jobFormData.rol}
+                      onChange={handleJobChange}
+                      required
+                    >
                       <option value="">Seleccione un área...</option>
-                      <option value="Administrador">Administración / Logística</option>
+                      <option value="Administrador">
+                        Administración / Logística
+                      </option>
                       <option value="Trabajador">Operario de Planta</option>
-                      <option value="Jefe de Calidad">Control de Calidad</option>
-                      <option value="Jefe de Ingeniería">Ingeniería y Diseño</option>
+                      <option value="Jefe de Calidad">
+                        Control de Calidad
+                      </option>
+                      <option value="Jefe de Ingeniería">
+                        Ingeniería y Diseño
+                      </option>
                     </select>
                   </div>
-                  <button 
-                    type="submit" 
+                  <button
+                    type="submit"
                     className="hero-button hero-button--primary job-submit-btn"
                     disabled={jobLoading}
-                    style={{ marginTop: '1rem' }}
+                    style={{ marginTop: "1rem" }}
                   >
-                    {jobLoading ? 'Procesando...' : 'Enviar mi postulación'}
+                    {jobLoading ? "Procesando..." : "Enviar mi postulación"}
                   </button>
                 </form>
               </>
