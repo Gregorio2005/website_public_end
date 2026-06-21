@@ -59,6 +59,7 @@ function Website() {
   });
   const [jobCvFile, setJobCvFile] = useState(null);
   const [jobLoading, setJobLoading] = useState(false);
+  const [errorModal, setErrorModal] = useState({ open: false, title: '', message: '' });
 
   useEffect(() => {
     // Configuración dinámica del favicon y título de la página
@@ -155,12 +156,12 @@ function Website() {
     const file = e.target.files[0];
     if (file) {
       if (file.type !== 'application/pdf') {
-        alert('Solo se permiten archivos en formato PDF.');
+        setErrorModal({ open: true, title: 'Formato inválido', message: 'Solo se permiten archivos en formato PDF.' });
         e.target.value = '';
         return;
       }
       if (file.size > 5 * 1024 * 1024) {
-        alert('El archivo no debe exceder 5MB.');
+        setErrorModal({ open: true, title: 'Archivo muy grande', message: 'El archivo no debe exceder 5MB.' });
         e.target.value = '';
         return;
       }
@@ -194,7 +195,7 @@ function Website() {
       });
       setJobCvFile(null);
     } catch (error) {
-      alert(`Error al enviar postulación: ${error.message}`);
+      setErrorModal({ open: true, title: 'Error al enviar', message: `Error al enviar postulación: ${error.message}` });
     } finally {
       setJobLoading(false);
     }
@@ -1791,6 +1792,40 @@ function Website() {
                 </form>
               </>
             )}
+          </div>
+        </div>
+      )}
+      {/* Modal de Error */}
+      {errorModal.open && (
+        <div
+          className="contact-overlay"
+          onClick={() => setErrorModal({ open: false, title: '', message: '' })}
+          style={{ zIndex: 9999 }}
+        >
+          <div
+            className="contact-modal"
+            style={{ maxWidth: '420px', width: '90%', textAlign: 'center', padding: '2.5rem' }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <span
+              className="material-symbols-outlined"
+              style={{ fontSize: '4rem', color: '#ef4444', marginBottom: '1rem', display: 'block' }}
+            >
+              error
+            </span>
+            <h3 style={{ fontSize: '1.25rem', fontWeight: 700, marginBottom: '0.5rem', color: isDarkMode ? '#f8fafc' : '#1e293b' }}>
+              {errorModal.title}
+            </h3>
+            <p style={{ fontSize: '0.9rem', color: isDarkMode ? '#94a3b8' : '#64748b', marginBottom: '1.5rem', lineHeight: 1.5 }}>
+              {errorModal.message}
+            </p>
+            <button
+              className="hero-button hero-button--primary"
+              style={{ width: '100%' }}
+              onClick={() => setErrorModal({ open: false, title: '', message: '' })}
+            >
+              Entendido
+            </button>
           </div>
         </div>
       )}
