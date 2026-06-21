@@ -50,10 +50,14 @@ function Website() {
   const [jobFormData, setJobFormData] = useState({
     name: "",
     lastname: "",
-    ci: "",
+    ci_type: "V-",
+    ci_number: "",
     email: "",
-    rol: "",
+    phone_prefix: "0414",
+    phone_number: "",
+    birth_date: "",
   });
+  const [jobCvFile, setJobCvFile] = useState(null);
   const [jobLoading, setJobLoading] = useState(false);
 
   useEffect(() => {
@@ -132,17 +136,63 @@ function Website() {
 
   const handleJobChange = (e) => {
     const { name, value } = e.target;
+    // Validación: ci_number solo números
+    if (name === 'ci_number') {
+      const cleaned = value.replace(/[^0-9]/g, '');
+      setJobFormData((prev) => ({ ...prev, [name]: cleaned }));
+      return;
+    }
+    // Validación: phone_number solo números
+    if (name === 'phone_number') {
+      const cleaned = value.replace(/[^0-9]/g, '');
+      setJobFormData((prev) => ({ ...prev, [name]: cleaned }));
+      return;
+    }
     setJobFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleJobFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (file.type !== 'application/pdf') {
+        alert('Solo se permiten archivos en formato PDF.');
+        e.target.value = '';
+        return;
+      }
+      if (file.size > 5 * 1024 * 1024) {
+        alert('El archivo no debe exceder 5MB.');
+        e.target.value = '';
+        return;
+      }
+      setJobCvFile(file);
+    }
   };
 
   const handleJobSubmit = async (e) => {
     e.preventDefault();
     setJobLoading(true);
     try {
-      await submitApplication(jobFormData);
+      // Construir FormData para enviar archivos
+      const formData = new FormData();
+      formData.append('name', jobFormData.name);
+      formData.append('lastname', jobFormData.lastname);
+      formData.append('ci', `${jobFormData.ci_type}${jobFormData.ci_number}`);
+      formData.append('email', jobFormData.email);
+      formData.append('phone', `${jobFormData.phone_prefix}-${jobFormData.phone_number}`);
+      formData.append('birth_date', jobFormData.birth_date);
+      formData.append('rol', notice.name !== 'none' ? notice.name : '');
+      if (jobCvFile) {
+        formData.append('cv', jobCvFile);
+      }
+
+      await submitApplication(formData);
       setPostulationSuccess(true);
       // Limpiar formulario
-      setJobFormData({ name: "", lastname: "", ci: "", email: "", rol: "" });
+      setJobFormData({
+        name: "", lastname: "", ci_type: "V-", ci_number: "", email: "",
+        phone_prefix: "0414", phone_number: "", birth_date: ""
+      });
+      setJobCvFile(null);
     } catch (error) {
       alert(`Error al enviar postulación: ${error.message}`);
     } finally {
@@ -1610,14 +1660,33 @@ function Website() {
                   </div>
                   <div className="job-form__field">
                     <label>Cédula de Identidad</label>
-                    <input
-                      type="text"
-                      name="ci"
-                      value={jobFormData.ci}
-                      onChange={handleJobChange}
-                      placeholder="V-00.000.000"
-                      required
-                    />
+                    <div style={{ display: 'flex', gap: '8px' }}>
+                      <select
+                        name="ci_type"
+                        value={jobFormData.ci_type}
+                        onChange={handleJobChange}
+                        style={{
+                          width: '80px', textAlign: 'center', fontWeight: 'bold',
+                          padding: '0.75rem', border: '1px solid #926f6a', borderRadius: '8px',
+                          backgroundColor: '#fff', color: '#191c1d', fontSize: '0.95rem',
+                        }}
+                      >
+                        <option value="V-">V-</option>
+                        <option value="E-">E-</option>
+                      </select>
+                      <input
+                        type="text"
+                        name="ci_number"
+                        value={jobFormData.ci_number}
+                        onChange={handleJobChange}
+                        placeholder="Solo números"
+                        style={{
+                          flex: 1, padding: '0.75rem', border: '1px solid #926f6a',
+                          borderRadius: '8px', fontSize: '0.95rem',
+                        }}
+                        required
+                      />
+                    </div>
                   </div>
                   <div className="job-form__field">
                     <label>Correo Electrónico</label>
@@ -1631,25 +1700,85 @@ function Website() {
                     />
                   </div>
                   <div className="job-form__field">
-                    <label>Cargo de interés</label>
-                    <select
-                      name="rol"
-                      value={jobFormData.rol}
+                    <label>Teléfono</label>
+                    <div style={{ display: 'flex', gap: '8px' }}>
+                      <select
+                        name="phone_prefix"
+                        value={jobFormData.phone_prefix}
+                        onChange={handleJobChange}
+                        style={{
+                          width: '100px', textAlign: 'center', fontWeight: 'bold',
+                          padding: '0.75rem', border: '1px solid #926f6a', borderRadius: '8px',
+                          backgroundColor: '#fff', color: '#191c1d', fontSize: '0.95rem',
+                        }}
+                      >
+                        <option value="0412">0412</option>
+                        <option value="0414">0414</option>
+                        <option value="0416">0416</option>
+                        <option value="0422">0422</option>
+                        <option value="0424">0424</option>
+                        <option value="0426">0426</option>
+                      </select>
+                      <input
+                        type="text"
+                        name="phone_number"
+                        value={jobFormData.phone_number}
+                        onChange={handleJobChange}
+                        placeholder="0000000"
+                        style={{
+                          flex: 1, padding: '0.75rem', border: '1px solid #926f6a',
+                          borderRadius: '8px', fontSize: '0.95rem',
+                        }}
+                      />
+                    </div>
+                  </div>
+                  <div className="job-form__field">
+                    <label>Fecha de Nacimiento</label>
+                    <input
+                      type="date"
+                      name="birth_date"
+                      value={jobFormData.birth_date}
                       onChange={handleJobChange}
-                      required
-                    >
-                      <option value="">Seleccione un área...</option>
-                      <option value="Administrador">
-                        Administración / Logística
-                      </option>
-                      <option value="Trabajador">Operario de Planta</option>
-                      <option value="Jefe de Calidad">
-                        Control de Calidad
-                      </option>
-                      <option value="Jefe de Ingeniería">
-                        Ingeniería y Diseño
-                      </option>
-                    </select>
+                    />
+                  </div>
+                  <div className="job-form__field">
+                    <label>Cargo de interés</label>
+                    <input
+                      type="text"
+                      name="rol"
+                      value={notice.name !== 'none' ? notice.name : ''}
+                      readOnly
+                      style={{
+                        padding: '0.75rem', width: '100%', boxSizing: 'border-box',
+                        border: '1px solid #926f6a', borderRadius: '8px',
+                        background: '#f3f4f5', color: '#191c1d', fontWeight: '600',
+                        cursor: 'not-allowed',
+                      }}
+                    />
+                  </div>
+                  <div className="job-form__field">
+                    <label>Currículum Vitae (PDF, máx. 5MB)</label>
+                    <input
+                      type="file"
+                      name="cv"
+                      accept=".pdf"
+                      onChange={handleJobFileChange}
+                      style={{
+                        padding: "0.75rem",
+                        border: "1px solid #926f6a",
+                        borderRadius: "8px",
+                        fontSize: "0.95rem",
+                        width: "100%",
+                        backgroundColor: "#fff",
+                        color: "#191c1d",
+                        cursor: "pointer",
+                      }}
+                    />
+                    {jobCvFile && (
+                      <span style={{ fontSize: '0.8rem', color: '#10b981', marginTop: '4px' }}>
+                        Archivo seleccionado: {jobCvFile.name}
+                      </span>
+                    )}
                   </div>
                   <button
                     type="submit"

@@ -1,19 +1,17 @@
 /**
  * Servicio para manejar la comunicación con el backend desde el Website independiente.
  */
-// CONFIGURACIÓN DE URL DE API
-// Descomenta la línea que necesites usar según el entorno:
-const API_URL = '/api'; // <--- USAR PARA DESARROLLO LOCAL
-//const API_URL = 'https://backend-sealing-products.onrender.com/api'; // <--- USAR PARA PRODUCCIÓN (Render)
+const API_URL = '/api'; // Desarrollo local
 
-export const submitApplication = async (applicantData) => {
+/**
+ * Envía una postulación con datos + CV (archivo PDF).
+ * Usa FormData en lugar de JSON para poder adjuntar el archivo.
+ */
+export const submitApplication = async (formData) => {
   try {
     const response = await fetch(`${API_URL}/applicants`, {
       method: 'POST',
-      headers: { 
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(applicantData)
+      body: formData // FormData ya incluye Content-Type multipart/form-data automáticamente
     });
 
     if (!response.ok) {
@@ -28,7 +26,7 @@ export const submitApplication = async (applicantData) => {
   }
 };
 
-/** 
+/**
  * Obtiene el aviso activo para el sitio web.
  */
 export const getWebsiteNotice = async () => {
