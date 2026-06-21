@@ -1,7 +1,8 @@
 /**
  * Servicio para manejar la comunicación con el backend desde el Website independiente.
  */
-const API_URL = '/api'; // Desarrollo local
+//const API_URL = '/api'; // <--- USAR PARA DESARROLLO LOCAL
+const API_URL = 'https://backend-sealing-products.onrender.com/api'; // <--- USAR PARA PRODUCCIÓN (Render)
 
 /**
  * Envía una postulación con datos + CV (archivo PDF).
