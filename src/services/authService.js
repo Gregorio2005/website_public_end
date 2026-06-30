@@ -1,8 +1,9 @@
 /**
  * Servicio para manejar la comunicación con el backend desde el Website independiente.
  */
-//const API_URL = '/api'; // <--- USAR PARA DESARROLLO LOCAL
-const API_URL = 'https://backend-sealing-products.onrender.com/api'; // <--- USAR PARA PRODUCCIÓN (Render)
+// CONFIGURACIÓN DE URL DE API
+// Se resuelve automáticamente según el entorno (.env / .env.production)
+const API_URL = import.meta.env.VITE_API_URL;
 
 /**
  * Envía una postulación con datos + CV (archivo PDF).
