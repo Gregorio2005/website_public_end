@@ -1,8 +1,6 @@
 /**
  * Servicio para manejar la comunicación con el backend desde el Website independiente.
  */
-// CONFIGURACIÓN DE URL DE API
-// Se resuelve automáticamente según el entorno (.env / .env.production)
 const API_URL = import.meta.env.VITE_API_URL;
 
 /**
