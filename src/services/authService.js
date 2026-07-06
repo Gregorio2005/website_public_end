@@ -49,3 +49,19 @@ export const getWebsiteNotice = async () => {
     return { enabled: false, note: "No disponible", name: 'none' };
   }
 };
+
+/**
+ * Obtiene los productos activos del catálogo web.
+ */
+export const getWebsiteProducts = async () => {
+  try {
+    const response = await fetch(`${API_URL}/website-products`, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' }
+    });
+    const data = await response.json();
+    return Array.isArray(data.data) ? data.data : [];
+  } catch (error) {
+    return [];
+  }
+};

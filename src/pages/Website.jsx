@@ -1,5 +1,5 @@
 ﻿import React, { useEffect, useState } from "react";
-import { submitApplication, getWebsiteNotice } from "../services/authService";
+import { submitApplication, getWebsiteNotice, getWebsiteProducts } from "../services/authService";
 import logoImg from "../assets/logo.jpeg";
 import estoperaImg from "../assets/estopera.png";
 import tapavalvulaImg from "../assets/tapa_valvula.png";
@@ -46,6 +46,9 @@ function Website() {
     name: "loading",
   });
 
+  // Estado para los productos del catálogo web
+  const [products, setProducts] = useState([]);
+
   // Estados para el formulario de postulación
   const [jobFormData, setJobFormData] = useState({
     name: "",
@@ -86,6 +89,9 @@ function Website() {
     };
 
     fetchNotice(); // Carga inicial al entrar
+
+    // Cargar productos del catálogo
+    getWebsiteProducts().then(setProducts);
 
     // Polling: Pregunta al servidor cada 30 segundos si el aviso cambió
     const intervalId = setInterval(fetchNotice, 30000);
@@ -447,10 +453,12 @@ function Website() {
           padding: 2.5rem !important;
         }
         .catalog-grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+          display: flex;
+          flex-wrap: wrap;
           gap: 2rem;
           padding: 1rem 0;
+          justify-content: center;
+          align-items: flex-start;
         }
         .catalog-item {
           background: #ffffff;
@@ -460,6 +468,10 @@ function Website() {
           transition: transform 0.3s ease, box-shadow 0.3s ease;
           display: flex;
           flex-direction: column;
+          width: calc((100% - 4rem) / 3);
+        }
+        @media (max-width: 767px) {
+          .catalog-item { width: 100%; }
         }
         .dark-mode .catalog-item {
           background: #1e293b;
@@ -472,7 +484,8 @@ function Website() {
         .catalog-item__img {
           width: 100%;
           height: 180px;
-          object-fit: cover;
+          object-fit: contain;
+          background-color: transparent;
           border-bottom: 1px solid #f1f5f9;
         }
         .dark-mode .catalog-item__img { border-color: #334155; }
@@ -790,76 +803,45 @@ function Website() {
           </div>
 
           <div className="products-grid">
-            <article className="product-card">
-              <img
-                className="product-card__image"
-                src={estoperaImg}
-                alt="Estopera industrial"
-              />
-              <div>
-                <h4>Estoperas</h4>
-                <p>
-                  Sellos robustos para retenes de ejes y bombas, con durabilidad
-                  industrial.
-                </p>
-              </div>
-            </article>
-            <article className="product-card">
-              <img
-                className="product-card__image"
-                src={tapavalvulaImg}
-                alt="Sello de válvula"
-              />
-              <div>
-                <h4>Sellos de Válvulas</h4>
-                <p>
-                  Empaquetaduras de alta precisión para tapas de válvula y
-                  espacios críticos.
-                </p>
-              </div>
-            </article>
-            <article className="product-card">
-              <img
-                className="product-card__image"
-                src={oringImg}
-                alt="Oring industrial"
-              />
-              <div>
-                <h4>Oring</h4>
-                <p>
-                  Juntas tóricas resistentes a altas temperaturas y fluidos
-                  agresivos.
-                </p>
-              </div>
-            </article>
-            <article className="product-card">
-              <img
-                className="product-card__image"
-                src={sellovalvulaImg}
-                alt="Tapa válvulas"
-              />
-              <div>
-                <h4>Tapa Válvulas</h4>
-                <p>
-                  Empaquetaduras y sellos para tapas de válvula con ajuste
-                  perfecto.
-                </p>
-              </div>
-            </article>
-            <article className="product-card">
-              <img
-                className="product-card__image"
-                src={collarinImg}
-                alt="Collarines"
-              />
-              <div>
-                <h4>Collarines</h4>
-                <p>
-                  Componentes de sello para retenes y guías de cojinete con
-                  acabado preciso.
-                </p>
-              </div>
-            </article>
+            {products.length > 0 ? (
+              products.sort((a, b) => a.display_order - b.display_order).map((product) => (
+                <article className="product-card" key={product.id}>
+                  <img
+                    className="product-card__image"
+                    src={product.image_url}
+                    alt={product.name}
+                    onError={(e) => { e.target.src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300"><rect fill="%23f1f5f9" width="400" height="300"/><text fill="%2394a3b8" font-family="sans-serif" font-size="18" text-anchor="middle" x="200" y="155">Sin imagen</text></svg>'; }}
+                  />
+                  <div>
+                    <h4>{product.name}</h4>
+                    <p>{product.description}</p>
+                  </div>
+                </article>
+              ))
+            ) : (
+              <>
+                <article className="product-card">
+                  <img className="product-card__image" src={estoperaImg} alt="Estopera industrial" />
+                  <div><h4>Estoperas</h4><p>Sellos robustos para retenes de ejes y bombas, con durabilidad industrial.</p></div>
+                </article>
+                <article className="product-card">
+                  <img className="product-card__image" src={tapavalvulaImg} alt="Sello de válvula" />
+                  <div><h4>Sellos de Válvulas</h4><p>Empaquetaduras de alta precisión para tapas de válvula y espacios críticos.</p></div>
+                </article>
+                <article className="product-card">
+                  <img className="product-card__image" src={oringImg} alt="Oring industrial" />
+                  <div><h4>Oring</h4><p>Juntas tóricas resistentes a altas temperaturas y fluidos agresivos.</p></div>
+                </article>
+                <article className="product-card">
+                  <img className="product-card__image" src={sellovalvulaImg} alt="Tapa válvulas" />
+                  <div><h4>Tapa Válvulas</h4><p>Empaquetaduras y sellos para tapas de válvula con ajuste perfecto.</p></div>
+                </article>
+                <article className="product-card">
+                  <img className="product-card__image" src={collarinImg} alt="Collarines" />
+                  <div><h4>Collarines</h4><p>Componentes de sello para retenes y guías de cojinete con acabado preciso.</p></div>
+                </article>
+              </>
+            )}
           </div>
         </div>
       </section>
@@ -1400,95 +1382,45 @@ function Website() {
 
             <div className="specs-scroll-area">
               <div className="catalog-grid">
-                <article className="catalog-item">
-                  <img
-                    src={estoperaImg}
-                    alt="Estopera"
-                    className="catalog-item__img"
-                  />
-                  <div className="catalog-item__info">
-                    <h4 className="catalog-item__title">Estoperas</h4>
-                    <p className="catalog-item__desc">
-                      Sellos robustos para retenes de ejes y bombas, fabricados
-                      en nitrilo de alta resistencia.
-                    </p>
-                  </div>
-                </article>
-
-                <article className="catalog-item">
-                  <img
-                    src={tapavalvulaImg}
-                    alt="Sello de válvula"
-                    className="catalog-item__img"
-                  />
-                  <div className="catalog-item__info">
-                    <h4 className="catalog-item__title">Sellos de Válvulas</h4>
-                    <p className="catalog-item__desc">
-                      Empaquetaduras de precisión para tapas de válvula con
-                      resistencia térmica superior.
-                    </p>
-                  </div>
-                </article>
-
-                <article className="catalog-item">
-                  <img
-                    src={oringImg}
-                    alt="Oring"
-                    className="catalog-item__img"
-                  />
-                  <div className="catalog-item__info">
-                    <h4 className="catalog-item__title">Orings</h4>
-                    <p className="catalog-item__desc">
-                      Juntas tóricas de Vitón y Silicona para aplicaciones
-                      químicas y de alta presión.
-                    </p>
-                  </div>
-                </article>
-
-                <article className="catalog-item">
-                  <img
-                    src={sellovalvulaImg}
-                    alt="Tapa Válvulas"
-                    className="catalog-item__img"
-                  />
-                  <div className="catalog-item__info">
-                    <h4 className="catalog-item__title">Tapa Válvulas</h4>
-                    <p className="catalog-item__desc">
-                      Empaquetaduras con ajuste OEM diseñadas para prevenir
-                      fugas de aceite en el motor.
-                    </p>
-                  </div>
-                </article>
-
-                <article className="catalog-item">
-                  <img
-                    src={collarinImg}
-                    alt="Collarín"
-                    className="catalog-item__img"
-                  />
-                  <div className="catalog-item__info">
-                    <h4 className="catalog-item__title">Collarines</h4>
-                    <p className="catalog-item__desc">
-                      Sellos hidráulicos especializados para vástagos y pistones
-                      de alta fricción.
-                    </p>
-                  </div>
-                </article>
-
-                <article className="catalog-item">
-                  <img
-                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuAy56S-3rFq9bNdszjdGqeHiWGaa9XWsK3ymeC-3BYgLICY3odniQ4vhkfB5R70XKFc2ZIyY3GmOZUpXuWWWox3zoYgL2UcbTxKJCdgU0WboBlAQXdc8UaeXA9Ve83C7A5bm8q0xndTKV9to7fYGadpZBKULiWdd136HEqPA3CL_BsG5oFBhIYeitF5YCj0KE3m99G24OQDeKdji6-wb46K2AfN5FsItPw70xguYaifu-n56CCVCOhRx73JJM3nBlhkqWDG0e0jBcA"
-                    alt="Especiales"
-                    className="catalog-item__img"
-                  />
-                  <div className="catalog-item__info">
-                    <h4 className="catalog-item__title">Piezas Especiales</h4>
-                    <p className="catalog-item__desc">
-                      Desarrollo de sellos a medida mediante ingeniería de
-                      reversa para equipos descontinuados.
-                    </p>
-                  </div>
-                </article>
+                {products.length > 0 ? (
+                  products.sort((a, b) => a.display_order - b.display_order).map((product) => (
+                    <article className="catalog-item" key={product.id}>
+                      <img
+                        src={product.image_url}
+                        alt={product.name}
+                        className="catalog-item__img"
+                        onError={(e) => { e.target.src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300"><rect fill="%23f1f5f9" width="400" height="300"/><text fill="%2394a3b8" font-family="sans-serif" font-size="18" text-anchor="middle" x="200" y="155">Sin imagen</text></svg>'; }}
+                      />
+                      <div className="catalog-item__info">
+                        <h4 className="catalog-item__title">{product.name}</h4>
+                        <p className="catalog-item__desc">{product.description}</p>
+                      </div>
+                    </article>
+                  ))
+                ) : (
+                  <>
+                    <article className="catalog-item">
+                      <img src={estoperaImg} alt="Estopera" className="catalog-item__img" />
+                      <div className="catalog-item__info"><h4 className="catalog-item__title">Estoperas</h4><p className="catalog-item__desc">Sellos robustos para retenes de ejes y bombas, fabricados en nitrilo de alta resistencia.</p></div>
+                    </article>
+                    <article className="catalog-item">
+                      <img src={tapavalvulaImg} alt="Sello de válvula" className="catalog-item__img" />
+                      <div className="catalog-item__info"><h4 className="catalog-item__title">Sellos de Válvulas</h4><p className="catalog-item__desc">Empaquetaduras de precisión para tapas de válvula con resistencia térmica superior.</p></div>
+                    </article>
+                    <article className="catalog-item">
+                      <img src={oringImg} alt="Oring" className="catalog-item__img" />
+                      <div className="catalog-item__info"><h4 className="catalog-item__title">Orings</h4><p className="catalog-item__desc">Juntas tóricas de Vitón y Silicona para aplicaciones químicas y de alta presión.</p></div>
+                    </article>
+                    <article className="catalog-item">
+                      <img src={sellovalvulaImg} alt="Tapa Válvulas" className="catalog-item__img" />
+                      <div className="catalog-item__info"><h4 className="catalog-item__title">Tapa Válvulas</h4><p className="catalog-item__desc">Empaquetaduras con ajuste OEM diseñadas para prevenir fugas de aceite en el motor.</p></div>
+                    </article>
+                    <article className="catalog-item">
+                      <img src={collarinImg} alt="Collarín" className="catalog-item__img" />
+                      <div className="catalog-item__info"><h4 className="catalog-item__title">Collarines</h4><p className="catalog-item__desc">Sellos hidráulicos especializados para vástagos y pistones de alta fricción.</p></div>
+                    </article>
+                  </>
+                )}
               </div>
             </div>
           </div>
