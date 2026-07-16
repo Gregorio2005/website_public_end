@@ -1,11 +1,6 @@
 ﻿import React, { useEffect, useState } from "react";
-import { submitApplication, getWebsiteNotice, getWebsiteProducts } from "../services/authService";
+import { submitApplication, getWebsiteNotice, getWebsiteProducts, RateLimitError } from "../services/authService";
 import logoImg from "../assets/logo.jpeg";
-import estoperaImg from "../assets/estopera.png";
-import tapavalvulaImg from "../assets/tapa_valvula.png";
-import oringImg from "../assets/oring.png";
-import sellovalvulaImg from "../assets/sello_valvula.png";
-import collarinImg from "../assets/collarin.png";
 import "./Website.css";
 
 const NAV_LINKS = [
@@ -38,6 +33,8 @@ function Website() {
   const [jobModalOpen, setJobModalOpen] = useState(false);
   const [postulationSuccess, setPostulationSuccess] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [rateLimited, setRateLimited] = useState(false);
+  const [retryCount, setRetryCount] = useState(0);
 
   // Estado para los avisos del administrador
   const [notice, setNotice] = useState({
@@ -80,6 +77,10 @@ function Website() {
         const currentNotice = await getWebsiteNotice();
         setNotice(currentNotice);
       } catch (error) {
+        if (error instanceof RateLimitError) {
+          setRateLimited(true);
+          return;
+        }
         setNotice({
           enabled: false,
           note: "No se pudo cargar el aviso.",
@@ -88,11 +89,23 @@ function Website() {
       }
     };
 
-    fetchNotice(); // Carga inicial al entrar
+    // Función para cargar productos
+    const fetchProducts = async () => {
+      try {
+        const data = await getWebsiteProducts();
+        setProducts(data);
+      } catch (error) {
+        if (error instanceof RateLimitError) {
+          setRateLimited(true);
+          return;
+        }
+        setProducts([]);
+      }
+    };
 
-    // Cargar productos del catálogo
-    getWebsiteProducts().then(setProducts);
-  }, []);
+    fetchNotice();
+    fetchProducts();
+  }, [retryCount]);
 
   useEffect(() => {
     const handleScroll = () => setHeaderElevated(window.scrollY > 50);
@@ -200,6 +213,82 @@ function Website() {
       setJobLoading(false);
     }
   };
+
+  const handleRetry = () => {
+    setRateLimited(false);
+    setNotice({ enabled: false, note: "Cargando aviso...", name: "loading" });
+    setProducts([]);
+    setRetryCount((prev) => prev + 1);
+  };
+
+  if (rateLimited) {
+    return (
+      <div style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        minHeight: '100vh',
+        padding: '2rem',
+        textAlign: 'center',
+        backgroundColor: isDarkMode ? '#0f172a' : '#f8fafc',
+        color: isDarkMode ? '#e2e8f0' : '#1e293b',
+        transition: 'background-color 0.3s ease, color 0.3s ease'
+      }}>
+        <button
+          onClick={() => setIsDarkMode(!isDarkMode)}
+          aria-label={isDarkMode ? "Activar modo claro" : "Activar modo oscuro"}
+          style={{
+            position: 'fixed',
+            top: '1.5rem',
+            right: '1.5rem',
+            background: 'transparent',
+            border: 'none',
+            cursor: 'pointer',
+            padding: '0.5rem',
+            borderRadius: '50%',
+            transition: 'background-color 0.2s'
+          }}
+        >
+          <span className="material-symbols-outlined" style={{ fontSize: '1.8rem', color: isDarkMode ? '#f8fafc' : '#1e293b' }}>
+            {isDarkMode ? "dark_mode" : "light_mode"}
+          </span>
+        </button>
+        <span className="material-symbols-outlined" style={{ fontSize: '5rem', color: '#ef4444', marginBottom: '1.5rem' }}>
+          wifi_off
+        </span>
+        <h1 style={{ fontSize: '1.8rem', fontWeight: 700, marginBottom: '0.75rem' }}>
+          Demasiadas solicitudes
+        </h1>
+        <p style={{
+          fontSize: '1rem',
+          color: isDarkMode ? '#94a3b8' : '#64748b',
+          maxWidth: '420px',
+          lineHeight: 1.6,
+          marginBottom: '2rem'
+        }}>
+          Se ha excedido el límite de solicitudes permitidas. Por favor, espere
+          unos minutos antes de intentar nuevamente.
+        </p>
+        <button
+          onClick={handleRetry}
+          style={{
+            padding: '0.85rem 2rem',
+            backgroundColor: '#d32f2f',
+            color: 'white',
+            border: 'none',
+            borderRadius: '10px',
+            fontSize: '1rem',
+            fontWeight: 600,
+            cursor: 'pointer',
+            transition: 'background-color 0.2s ease, transform 0.2s ease'
+          }}
+        >
+          Reintentar
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className={`website-page ${isDarkMode ? "dark-mode" : ""}`}>
@@ -813,28 +902,9 @@ function Website() {
                 </article>
               ))
             ) : (
-              <>
-                <article className="product-card">
-                  <img className="product-card__image" src={estoperaImg} alt="Estopera industrial" />
-                  <div><h4>Estoperas</h4><p>Sellos robustos para retenes de ejes y bombas, con durabilidad industrial.</p></div>
-                </article>
-                <article className="product-card">
-                  <img className="product-card__image" src={tapavalvulaImg} alt="Sello de válvula" />
-                  <div><h4>Sellos de Válvulas</h4><p>Empaquetaduras de alta precisión para tapas de válvula y espacios críticos.</p></div>
-                </article>
-                <article className="product-card">
-                  <img className="product-card__image" src={oringImg} alt="Oring industrial" />
-                  <div><h4>Oring</h4><p>Juntas tóricas resistentes a altas temperaturas y fluidos agresivos.</p></div>
-                </article>
-                <article className="product-card">
-                  <img className="product-card__image" src={sellovalvulaImg} alt="Tapa válvulas" />
-                  <div><h4>Tapa Válvulas</h4><p>Empaquetaduras y sellos para tapas de válvula con ajuste perfecto.</p></div>
-                </article>
-                <article className="product-card">
-                  <img className="product-card__image" src={collarinImg} alt="Collarines" />
-                  <div><h4>Collarines</h4><p>Componentes de sello para retenes y guías de cojinete con acabado preciso.</p></div>
-                </article>
-              </>
+              <p style={{ gridColumn: '1 / -1', textAlign: 'center', color: isDarkMode ? '#94a3b8' : '#64748b', padding: '2rem 0' }}>
+                No hay productos disponibles por el momento.
+              </p>
             )}
           </div>
         </div>
@@ -1392,28 +1462,9 @@ function Website() {
                     </article>
                   ))
                 ) : (
-                  <>
-                    <article className="catalog-item">
-                      <img src={estoperaImg} alt="Estopera" className="catalog-item__img" />
-                      <div className="catalog-item__info"><h4 className="catalog-item__title">Estoperas</h4><p className="catalog-item__desc">Sellos robustos para retenes de ejes y bombas, fabricados en nitrilo de alta resistencia.</p></div>
-                    </article>
-                    <article className="catalog-item">
-                      <img src={tapavalvulaImg} alt="Sello de válvula" className="catalog-item__img" />
-                      <div className="catalog-item__info"><h4 className="catalog-item__title">Sellos de Válvulas</h4><p className="catalog-item__desc">Empaquetaduras de precisión para tapas de válvula con resistencia térmica superior.</p></div>
-                    </article>
-                    <article className="catalog-item">
-                      <img src={oringImg} alt="Oring" className="catalog-item__img" />
-                      <div className="catalog-item__info"><h4 className="catalog-item__title">Orings</h4><p className="catalog-item__desc">Juntas tóricas de Vitón y Silicona para aplicaciones químicas y de alta presión.</p></div>
-                    </article>
-                    <article className="catalog-item">
-                      <img src={sellovalvulaImg} alt="Tapa Válvulas" className="catalog-item__img" />
-                      <div className="catalog-item__info"><h4 className="catalog-item__title">Tapa Válvulas</h4><p className="catalog-item__desc">Empaquetaduras con ajuste OEM diseñadas para prevenir fugas de aceite en el motor.</p></div>
-                    </article>
-                    <article className="catalog-item">
-                      <img src={collarinImg} alt="Collarín" className="catalog-item__img" />
-                      <div className="catalog-item__info"><h4 className="catalog-item__title">Collarines</h4><p className="catalog-item__desc">Sellos hidráulicos especializados para vástagos y pistones de alta fricción.</p></div>
-                    </article>
-                  </>
+                  <p style={{ gridColumn: '1 / -1', textAlign: 'center', color: isDarkMode ? '#94a3b8' : '#64748b', padding: '2rem 0' }}>
+                    No hay productos disponibles por el momento.
+                  </p>
                 )}
               </div>
             </div>

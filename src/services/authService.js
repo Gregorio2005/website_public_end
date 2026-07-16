@@ -3,6 +3,13 @@
  */
 const API_URL = import.meta.env.VITE_API_URL;
 
+export class RateLimitError extends Error {
+  constructor(message = 'Demasiadas solicitudes') {
+    super(message);
+    this.name = 'RateLimitError';
+  }
+}
+
 /**
  * Envía una postulación con datos + CV (archivo PDF).
  * Usa FormData en lugar de JSON para poder adjuntar el archivo.
@@ -13,6 +20,10 @@ export const submitApplication = async (formData) => {
       method: 'POST',
       body: formData // FormData ya incluye Content-Type multipart/form-data automáticamente
     });
+
+    if (response.status === 429) {
+      throw new RateLimitError();
+    }
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
@@ -30,38 +41,39 @@ export const submitApplication = async (formData) => {
  * Obtiene el aviso activo para el sitio web.
  */
 export const getWebsiteNotice = async () => {
-  try {
-    const response = await fetch(`${API_URL}/website-notice`, {
-      method: 'GET',
-      headers: { 'Content-Type': 'application/json' }
-    });
-    const data = await response.json();
-    
-    const latestNotice = Array.isArray(data.data) && data.data.length > 0 ? data.data[0] : null;
-    
-    return { 
-      enabled: !!latestNotice, 
-      note: latestNotice?.note || 'Actualmente no contamos con vacantes disponibles.', 
-      name: latestNotice?.name || 'none',
-      id: latestNotice?.id || null
-    };
-  } catch (error) {
-    return { enabled: false, note: "No disponible", name: 'none' };
+  const response = await fetch(`${API_URL}/website-notice`, {
+    method: 'GET',
+    headers: { 'Content-Type': 'application/json' }
+  });
+
+  if (response.status === 429) {
+    throw new RateLimitError();
   }
+
+  const data = await response.json();
+  const latestNotice = Array.isArray(data.data) && data.data.length > 0 ? data.data[0] : null;
+
+  return {
+    enabled: !!latestNotice,
+    note: latestNotice?.note || 'Actualmente no contamos con vacantes disponibles.',
+    name: latestNotice?.name || 'none',
+    id: latestNotice?.id || null
+  };
 };
 
 /**
  * Obtiene los productos activos del catálogo web.
  */
 export const getWebsiteProducts = async () => {
-  try {
-    const response = await fetch(`${API_URL}/website-products`, {
-      method: 'GET',
-      headers: { 'Content-Type': 'application/json' }
-    });
-    const data = await response.json();
-    return Array.isArray(data.data) ? data.data : [];
-  } catch (error) {
-    return [];
+  const response = await fetch(`${API_URL}/website-products`, {
+    method: 'GET',
+    headers: { 'Content-Type': 'application/json' }
+  });
+
+  if (response.status === 429) {
+    throw new RateLimitError();
   }
+
+  const data = await response.json();
+  return Array.isArray(data.data) ? data.data : [];
 };
