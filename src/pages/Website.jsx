@@ -92,12 +92,6 @@ function Website() {
 
     // Cargar productos del catálogo
     getWebsiteProducts().then(setProducts);
-
-    // Polling: Pregunta al servidor cada 30 segundos si el aviso cambió
-    const intervalId = setInterval(fetchNotice, 30000);
-
-    // Limpieza al salir de la página
-    return () => clearInterval(intervalId);
   }, []);
 
   useEffect(() => {
